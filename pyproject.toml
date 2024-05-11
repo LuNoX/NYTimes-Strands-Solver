@@ -9,6 +9,9 @@ readme = "README.md"
 python = "^3.12"
 requests = "^2.31.0"
 numpy = "^1.26.4"
+lxml = "^5.2.1"
+selenium = "^4.20.0"
+beautifulsoup4 = "^4.12.3"
 
 
 [build-system]
