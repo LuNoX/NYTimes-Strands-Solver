@@ -4,13 +4,13 @@ from typing import Tuple, override
 
 from strandssolver import gamestate
 from strandssolver.parsers import parser
-from strandssolver.readers import htmlreader
+from strandssolver.readers import reader, htmlreader
 
 
 class HTMLParser(parser.Parser):
     def __init__(self,
                  html: str = None,
-                 html_reader: htmlreader.HTMLReader = None
+                 html_reader: reader.Reader = None
                  ) -> None:
         if html_reader is None:
             html_reader = htmlreader.HTMLReader()
@@ -66,12 +66,10 @@ class HTMLParser(parser.Parser):
 
 
 def _test() -> None:
-    with open("Strands_ Uncover words. - The New York Times.html",
-              "r", encoding="utf-8") as f:
-        html = f.read()
-        html_parser = HTMLParser(html=html)
-        print(html_parser._parse_theme())
-        print(html_parser._parse_word_counts())
+    from test.stubs.stubhtmlreader import StubHTMLReader
+    html_parser = HTMLParser(html_reader=StubHTMLReader())
+    print(html_parser._parse_theme())
+    print(html_parser._parse_word_counts())
 
 
 if __name__ == "__main__":
