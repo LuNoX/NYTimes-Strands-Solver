@@ -17,16 +17,24 @@ class HTMLParser(parser.Parser):
         self.html_reader = html_reader
         if html is None:
             html = self.html_reader.read()
+        self._html = None
         self.html = html
+
+    @property
+    def html(self) -> str:
+        return self._html
+
+    @html.setter
+    def html(self, html: str) -> None:
+        self._html = html
+        self.soup = bs4.BeautifulSoup(self.html, 'lxml')
 
     @override
     def parse(self) -> gamestate.GameState:
-        soup = bs4.BeautifulSoup(self.html, 'lxml')
-        theme = HTMLParser._get_theme_from_response(soup)
-        solved_words, total_words = HTMLParser._get_word_counts_from_response(
-            soup)
-        hints, next_hint = HTMLParser._get_hint_counts_from_response(soup)
-        board = HTMLParser._get_board_from_response(soup)
+        theme = self._parse_theme()
+        solved_words, total_words = self._parse_word_counts()
+        hints, next_hint = self._parse_hint_counts()
+        board = self._parse_board()
         game_state = gamestate.GameState(
             board=board,
             theme=theme,
@@ -37,36 +45,24 @@ class HTMLParser(parser.Parser):
         )
         return game_state
 
-    @staticmethod
-    def _get_board_from_response(tree
-                                 ) -> gamestate.Board:
+    def _parse_board(self) -> gamestate.Board:
         ...
 
-    @staticmethod
-    def _get_theme_from_response(tree) -> str:
+    def _parse_theme(self) -> str:
         # <h1 class="umfyna_clue">theme</h1>
-        theme = tree.xpath('//h1[@class="umfyna_clue"]')
-        if len(theme) > 1:
-            raise ValueError('Multiple themes found')
-        return theme[0].text
+        theme = self.soup.find('//h1[@class="umfyna_clue"]')
+        return theme.text
 
-    @staticmethod
-    def _get_word_counts_from_response(tree
-                                       ) -> Tuple[int, int]:
+    def _parse_word_counts(self) -> Tuple[int, int]:
         ...
 
-    @staticmethod
-    def _get_hint_counts_from_response(tree
-                                       ) -> Tuple[int, int]:
+    def _parse_hint_counts(self) -> Tuple[int, int]:
         ...
 
 
 def _test() -> None:
-    # with open("Strands_ Uncover words. - The New York Times.html",
-    #           "r", encoding='utf-8') as f:
-    #     tree = html.fromstring(f.read())
-    #     print(HtmlReader._get_theme_from_response(tree))
-    ...
+    html_parser = HTMLParser()
+    print(html_parser._)
 
 
 if __name__ == "__main__":
