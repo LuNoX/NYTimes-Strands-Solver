@@ -27,5 +27,3 @@ class GameState:
     theme: str
     number_of_total_words: int
     number_of_solved_words: int = 0
-    number_of_hints_available: int = 0
-    number_of_finds_until_next_hint: int = 0
