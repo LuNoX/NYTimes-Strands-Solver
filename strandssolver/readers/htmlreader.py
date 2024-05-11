@@ -26,6 +26,7 @@ class HTMLReader(reader.Reader):
                  ) -> None:
         self.url = url
         self.max_attempts = max_attempts
+        self._seconds_between_attempts = None
         self.seconds_between_attempts = seconds_between_attempts
         self.load_complete_when_html_contains_this = \
             load_complete_when_html_contains_this
