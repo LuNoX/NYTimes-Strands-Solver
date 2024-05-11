@@ -33,15 +33,12 @@ class HTMLParser(parser.Parser):
     def parse(self) -> gamestate.GameState:
         theme = self._parse_theme()
         solved_words, total_words = self._parse_word_counts()
-        hints, next_hint = self._parse_hint_counts()
         board = self._parse_board()
         game_state = gamestate.GameState(
             board=board,
             theme=theme,
             number_of_solved_words=solved_words,
             number_of_total_words=total_words,
-            number_of_hints_available=hints,
-            number_of_finds_until_next_hint=next_hint
         )
         return game_state
 
@@ -50,19 +47,31 @@ class HTMLParser(parser.Parser):
 
     def _parse_theme(self) -> str:
         # <h1 class="umfyna_clue">theme</h1>
-        theme = self.soup.find('//h1[@class="umfyna_clue"]')
+        theme = self.soup.find('h1', attrs={'class': 'umfyna_clue'})
         return theme.text
 
     def _parse_word_counts(self) -> Tuple[int, int]:
-        ...
-
-    def _parse_hint_counts(self) -> Tuple[int, int]:
-        ...
+        # <div class="XmXXwG_hint" id="hint" style="visibility: visible;">
+        #   <div>...</div>
+        #   <p>
+        #       <b>0</b> of <b>7</b> theme words found.
+        #   </p>
+        #   ...
+        # </div>
+        hint = self.soup.find(id='hint')
+        paragraph = hint.find("p", recursive=False)
+        solved = paragraph.find("b")
+        total = solved.findNextSibling()
+        return int(solved.text), int(total.text)
 
 
 def _test() -> None:
-    html_parser = HTMLParser()
-    print(html_parser._)
+    with open("Strands_ Uncover words. - The New York Times.html",
+              "r", encoding="utf-8") as f:
+        html = f.read()
+        html_parser = HTMLParser(html=html)
+        print(html_parser._parse_theme())
+        print(html_parser._parse_word_counts())
 
 
 if __name__ == "__main__":
