@@ -1,25 +1,27 @@
 import bs4
-import time
 
-from datetime import timedelta
 from typing import Tuple, override
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 from strandssolver import gamestate
 from strandssolver.parsers import parser
+from strandssolver.readers import htmlreader
 
 
 class HTMLParser(parser.Parser):
-    default_strands_url = "https://www.nytimes.com/games/strands"
-
-    def __int__(self):
-        ...
+    def __init__(self,
+                 html: str = None,
+                 html_reader: htmlreader.HTMLReader = None
+                 ) -> None:
+        if html_reader is None:
+            html_reader = htmlreader.HTMLReader()
+        self.html_reader = html_reader
+        if html is None:
+            html = self.html_reader.read()
+        self.html = html
 
     @override
-    def parse(self, url: str | bytes = None) -> gamestate.GameState:
-        html = HTMLParser._get_html(url)
-        soup = bs4.BeautifulSoup(html, 'lxml')
+    def parse(self) -> gamestate.GameState:
+        soup = bs4.BeautifulSoup(self.html, 'lxml')
         theme = HTMLParser._get_theme_from_response(soup)
         solved_words, total_words = HTMLParser._get_word_counts_from_response(
             soup)
@@ -34,36 +36,6 @@ class HTMLParser(parser.Parser):
             number_of_finds_until_next_hint=next_hint
         )
         return game_state
-
-    @staticmethod
-    def _get_html(url: str | bytes = None,
-                  max_attempts: int = 5,
-                  time_between_attempts: float | timedelta = 5,
-                  load_complete_when_this_str_is_present: str = "TODAY’S THEME"
-                  ) -> str:
-        if url is None:
-            url = HTMLParser.default_strands_url
-        if isinstance(time_between_attempts, timedelta):
-            time_between_attempts = timedelta.total_seconds()
-
-        chrome_options = Options()
-        chrome_options.add_argument("--headless=new")
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.get(url)
-
-        html = driver.page_source
-        # Previous line is the first attempt, so entering the loop is attempt 2
-        for attempt in range(2, max_attempts + 1):
-            if load_complete_when_this_str_is_present.lower() in html.lower():
-                break
-            if attempt == max_attempts:
-                raise TimeoutError(
-                    f"Request timed out after {max_attempts} attempts."
-                )
-            time.sleep(time_between_attempts)
-            html = driver.page_source
-
-        return html
 
     @staticmethod
     def _get_board_from_response(tree
@@ -94,7 +66,7 @@ def _test() -> None:
     #           "r", encoding='utf-8') as f:
     #     tree = html.fromstring(f.read())
     #     print(HtmlReader._get_theme_from_response(tree))
-    print(HTMLParser._get_html())
+    ...
 
 
 if __name__ == "__main__":
