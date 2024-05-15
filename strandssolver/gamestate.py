@@ -10,14 +10,11 @@ class Board:
     def __init__(self,
                  characters: np.typing.NDArray[np.str_],
                  solved_states: np.typing.NDArray[np.bool_] = None,
-                 partially_solved: bool = True
                  ) -> None:
         self.characters = characters
         if solved_states is None:
             solved_states = self._default_solved_states()
-            partially_solved = False
         self.solved_states = solved_states
-        self.partially_solved = partially_solved
 
     @property
     def shape(self) -> Tuple[int, ...]:
@@ -39,7 +36,6 @@ class Board:
             "shape": self.shape,
             "characters": self.characters,
             "solved_states": self.solved_states,
-            "partial_solved": self.partially_solved
         }
         return str(representation)
 
