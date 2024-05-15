@@ -43,7 +43,40 @@ class HTMLParser(parser.Parser):
         return game_state
 
     def _parse_board(self) -> gamestate.Board:
-        ...
+        '''
+        <div class="UOpmtW_board">
+           <div class="F9LmoG_standard" ... data-flip-id="pulser-0" ... >
+              <button class="pRjvKq_item"
+                  type="button"
+                  id="button-0">
+                      O
+              </button>
+           </div>
+           ...
+           </div>
+           <div class="F9LmoG_standard" ... data-flip-id="pulser-47" ... >
+              <button class="pRjvKq_item"
+                  type="button"
+                  id="button-47">
+                      P
+              </button>
+           </div>
+        </div>
+        '''
+        board = self.soup.find("div", attrs={"class": 'UOpmtW_board'})
+        buttons = board.findAll("button", attrs={"class": 'pRjvKq_item'})
+
+        letters = []
+        for button in buttons:
+            index = int(button.attrs["id"].strip("button-"))
+            letter = button.text
+            letters.append((index, letter))
+        letters = sorted(letters, key=lambda tup: tup[0])
+        letters = [letter for _, letter in letters]
+
+        char_matrix = gamestate.Board.characters_matrix_from_letters(letters)
+        board = gamestate.Board(char_matrix)
+        return board
 
     def _parse_theme(self) -> str:
         # <h1 class="umfyna_clue">theme</h1>
@@ -68,8 +101,7 @@ class HTMLParser(parser.Parser):
 def _test() -> None:
     from test.stubs.stubhtmlreader import StubHTMLReader
     html_parser = HTMLParser(html_reader=StubHTMLReader())
-    print(html_parser._parse_theme())
-    print(html_parser._parse_word_counts())
+    print(html_parser.parse())
 
 
 if __name__ == "__main__":
