@@ -1,8 +1,8 @@
 import networkx as nx
 import numpy as np
-import numpy.typing
+from matplotlib import pyplot as plt
+
 from typing import Tuple
-from functools import cache
 
 from strandssolver import gamestate
 
@@ -14,60 +14,26 @@ class CharacterGraph:
 
     @staticmethod
     def generate_graph_from_board(board: gamestate.Board) -> nx.Graph:
-        graph = nx.Graph()
+        graph = CharacterGraph.diagonally_connected_grid_graph(board.shape)
 
         it = np.nditer(board.characters, flags=['multi_index'])
-        for character in it:
-            graph.add_node(it.multi_index, character=character)
+        node_attributes = {it.multi_index: {"character": str(character)}
+                           for character in it}
+        nx.set_node_attributes(graph, node_attributes)
 
-        it.reset()
-        for _ in it:
-            neighbours = CharacterGraph.valid_neighbour_indices(it.multi_index,
-                                                                board.shape)
-            edges = [(it.multi_index, tuple(neighbour)) for neighbour in
-                     neighbours]
-            graph.add_edges_from(edges)
+        it = np.nditer(board.solved_states, flags=['multi_index'])
+        solved_nodes = [it.multi_index for solved in it if solved]
+        graph.remove_nodes_from(solved_nodes)
 
-        print(graph)
         return graph
 
     @staticmethod
-    @cache
-    def neighbour_index_offsets(shape: Tuple[int, ...],
-                                exclude_self: bool = True
-                                ) -> np.typing.NDArray[np.int_]:
-        # Adapted from
-        # https://stackoverflow.com/questions/34905274/how-to-find-the-neighbors-of-a-cell-in-an-ndarray
-        number_of_dims = len(shape)
+    def diagonally_connected_grid_graph(shape: Tuple[int, ...]) -> nx.Graph:
+        graph = nx.grid_graph(list(reversed(shape)))
 
-        # generate an (m, ndims) array containing all strings
-        # over the alphabet {0, 1, 2}:
-        offset_idx = np.indices((3,) * number_of_dims
-                                ).reshape(number_of_dims, -1).T
+        # TODO: diagonals
 
-        # use these to index into np.array([-1, 0, 1]) to get offsets
-        offsets = np.r_[-1, 0, 1].take(offset_idx)
-
-        # optional: exclude offsets of 0, 0, ..., 0 (i.e. p itself)
-        if exclude_self:
-            offsets = offsets[np.any(offsets, 1)]
-
-        return offsets
-
-    @staticmethod
-    def valid_neighbour_indices(home_index: Tuple[int, ...],
-                                shape: Tuple[int, ...],
-                                ) -> np.typing.NDArray[np.int_]:
-        offsets = CharacterGraph.neighbour_index_offsets(shape)
-        neighbours: np.typing.NDArray[np.int_] = home_index + offsets
-
-        in_bounds = np.all(
-            (neighbours < np.array(shape)) & (neighbours >= 0),
-            axis=1
-        )
-        neighbours = neighbours[in_bounds]
-
-        return neighbours
+        return graph
 
 
 def _test() -> None:
@@ -76,10 +42,16 @@ def _test() -> None:
 
     parser = htmlparser.HTMLParser(html_reader=stubhtmlreader.StubHTMLReader())
     game = parser.parse()
+    game.board.solved_states[1, 2] = True
     graph = CharacterGraph(game.board)
 
-    grid = nx.grid_graph(game.board.shape)
-    print(grid)
+    pos = nx.spring_layout(graph.graph)
+    nx.draw(graph.graph, pos=pos)
+    nx.draw_networkx_labels(graph.graph,
+                            labels={node[0]: node[1]["character"]
+                                    for node in graph.graph.nodes(data=True)},
+                            pos=pos)
+    plt.show()
 
 
 if __name__ == "__main__":
