@@ -87,10 +87,18 @@ class CharacterGraphBuilder:
 def _test() -> None:
     from test.stubs import stubhtmlreader
     from strandssolver.parsers import htmlparser
+    from timeit import timeit
 
     parser = htmlparser.HTMLParser(html_reader=stubhtmlreader.StubHTMLReader())
     game = parser.parse()
-    game.board.solved_states[1, 2] = True
+    game.board.solved_states[[1, 2, 3], [1, 2, 3]] = True
+
+    loop = 1000
+    time = timeit(
+        lambda: CharacterGraphBuilder.generate_graph_from_board(game.board),
+        number=loop
+    )
+    print(time / loop)
     graph = CharacterGraphBuilder.generate_graph_from_board(game.board)
 
     pos = nx.spring_layout(graph)
