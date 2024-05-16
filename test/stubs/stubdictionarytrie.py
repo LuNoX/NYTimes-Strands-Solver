@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pygtrie
 
@@ -25,18 +27,19 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
     @staticmethod
     @override
     def load_trie_from_json(path: str | bytes | os.PathLike = None,
-                            encoding: str = super().DEFAULT_JSON_ENCODING,
+                            encoding: str = None,
                             cast_to: Type[pygtrie.Trie] = pygtrie.CharTrie
                             ) -> pygtrie.Trie:
         if path is None:
             path = StubDictionaryTrieBuilder.DEFAULT_TRIE_PATH
-        return super().load_trie_from_json(
-            path, encoding=encoding, cast_to=cast_to)
+        return super(
+            StubDictionaryTrieBuilder, StubDictionaryTrieBuilder
+        ).load_trie_from_json(path, encoding=encoding, cast_to=cast_to)
 
     @staticmethod
     @override
-    def store_trie_as_json(trie: pygtrie.Trie,
-                           path: str | bytes | os.PathLike,
+    def store_trie_as_json(trie: pygtrie.Trie = None,
+                           path: str | bytes | os.PathLike = None,
                            encoding: str = None,
                            ensure_ascii: bool = None,
                            indent: int = None
