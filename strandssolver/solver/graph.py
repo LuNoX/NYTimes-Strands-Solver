@@ -32,9 +32,9 @@ class CharacterGraphBuilder:
         graph = nx.grid_graph(list(reversed(shape)))
 
         for node in graph:
-            neigbours = CharacterGraphBuilder.valid_neighbour_indices(
+            neighbours = CharacterGraphBuilder.valid_neighbour_indices(
                 node, shape, only_diagonals=True)
-            edges = [(node, tuple(neigbour)) for neigbour in neigbours]
+            edges = [(node, tuple(neighbour)) for neighbour in neighbours]
             graph.add_edges_from(edges)
 
         return graph
