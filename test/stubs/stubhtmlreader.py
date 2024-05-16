@@ -1,12 +1,13 @@
 import os
 
 from importlib import resources
+from typing import override
 
-from strandssolver.readers import reader
+from strandssolver.readers import htmlreader
 from test import data
 
 
-class StubHTMLReader(reader.Reader):
+class StubHTMLReader(htmlreader.HTMLReader):
     DEFAULT_FILE_PATH = resources.files(data).joinpath(
         'Strands_ Uncover words. - The New York Times.html')
 
@@ -16,3 +17,11 @@ class StubHTMLReader(reader.Reader):
         with open(filepath, "r", encoding="utf-8") as f:
             html = f.read()
             return html
+
+    @override
+    def _setup_webdriver(self) -> None:
+        raise NotImplementedError()
+
+    @override
+    def _get_html_source(self) -> None:
+        raise NotImplementedError()
