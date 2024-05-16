@@ -20,8 +20,14 @@ class StubHTMLReader(htmlreader.HTMLReader):
 
     @override
     def _setup_webdriver(self) -> None:
-        raise NotImplementedError()
+        """
+        Stub method
+        """
+        pass
 
     @override
     def _get_html_source(self) -> None:
-        raise NotImplementedError()
+        """
+        Stub method
+        """
+        pass
