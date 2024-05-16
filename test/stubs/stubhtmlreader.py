@@ -5,11 +5,11 @@ from typing import override
 
 from strandssolver.readers import htmlreader
 from test import data
+from test.data import filenames
 
 
 class StubHTMLReader(htmlreader.HTMLReader):
-    DEFAULT_FILE_PATH = resources.files(data).joinpath(
-        'Strands_ Uncover words. - The New York Times.html')
+    DEFAULT_FILE_PATH = resources.files(data).joinpath(filenames.strands_html)
 
     def read(self, filepath: str | bytes | os.PathLike = None) -> str:
         if filepath is None:

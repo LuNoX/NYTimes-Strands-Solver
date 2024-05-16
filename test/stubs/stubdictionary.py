@@ -5,11 +5,12 @@ from typing import override
 
 from strandssolver.solver import dictionary
 from test import data
+from test.data import filenames
 
 
 class StubDictionary(dictionary.Dictionary):
     DEFAULT_DICTIONARY_PATH = resources.files(data).joinpath(
-        'words_dictionary.json')
+        filenames.words_dictionary)
 
     @override
     def __init__(self, path: str | bytes | os.PathLike = None) -> None:
