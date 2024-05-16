@@ -104,8 +104,8 @@ def _test() -> None:
     pos = nx.spring_layout(graph)
     nx.draw(graph, pos=pos)
     nx.draw_networkx_labels(graph,
-                            labels={node[0]: node[1]["character"]
-                                    for node in graph.nodes(data=True)},
+                            labels={node: data["character"]
+                                    for node, data in graph.nodes(data=True)},
                             pos=pos)
     plt.show()
 
