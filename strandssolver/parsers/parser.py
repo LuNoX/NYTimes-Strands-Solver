@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from strandssolver import gamestate
+from strandssolver.models import gamestate
 
 
 class Parser(Protocol):

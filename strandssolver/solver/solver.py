@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Iterable, Tuple, Set, Callable
 import networkx as nx
 
-from strandssolver import gamestate
+from strandssolver.models import gamestate
 
 
 @dataclass

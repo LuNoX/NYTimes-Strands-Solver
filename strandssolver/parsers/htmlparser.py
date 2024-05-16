@@ -2,7 +2,7 @@ import bs4
 
 from typing import Tuple, override
 
-from strandssolver import gamestate
+from strandssolver.models import gamestate
 from strandssolver.parsers import parser
 from strandssolver.readers import reader, htmlreader
 

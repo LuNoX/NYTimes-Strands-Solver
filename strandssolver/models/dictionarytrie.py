@@ -4,7 +4,7 @@ import json
 
 from typing import Type
 
-from strandssolver.solver.dictionary import Dictionary
+from strandssolver.models.dictionary import Dictionary
 
 
 class DictionaryTrieBuilder:

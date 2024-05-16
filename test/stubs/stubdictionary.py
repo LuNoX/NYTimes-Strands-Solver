@@ -3,7 +3,7 @@ import os
 from importlib import resources
 from typing import override
 
-from strandssolver.solver import dictionary
+from strandssolver.models import dictionary
 from test import data
 from test.data import filenames
 

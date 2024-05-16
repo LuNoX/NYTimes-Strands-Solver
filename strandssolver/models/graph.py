@@ -6,7 +6,7 @@ import numpy.typing
 
 from typing import Tuple
 
-from strandssolver import gamestate
+from strandssolver.models import gamestate
 
 
 class CharacterGraphBuilder:
