@@ -12,7 +12,7 @@ from strandssolver import gamestate
 class CharacterGraphBuilder:
 
     @staticmethod
-    def generate_graph_from_board(board: gamestate.Board) -> nx.Graph:
+    def build_graph_from_board(board: gamestate.Board) -> nx.Graph:
         graph = CharacterGraphBuilder.diagonally_connected_grid_graph(
             board.shape)
 
@@ -95,11 +95,11 @@ def _test() -> None:
 
     loop = 1000
     time = timeit(
-        lambda: CharacterGraphBuilder.generate_graph_from_board(game.board),
+        lambda: CharacterGraphBuilder.build_graph_from_board(game.board),
         number=loop
     )
     print(time / loop)
-    graph = CharacterGraphBuilder.generate_graph_from_board(game.board)
+    graph = CharacterGraphBuilder.build_graph_from_board(game.board)
 
     pos = nx.spring_layout(graph)
     nx.draw(graph, pos=pos)
