@@ -11,6 +11,6 @@ class StubHTMLParser(htmlparser.HTMLParser):
                  html: str = None,
                  html_reader: reader.Reader = None
                  ) -> None:
-        if html_reader is not None:
+        if html_reader is None:
             html_reader = stubhtmlreader.StubHTMLReader()
         super().__init__(html=html, html_reader=html_reader)
