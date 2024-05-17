@@ -85,12 +85,12 @@ class CharacterGraphBuilder:
 
 
 def _test() -> None:
-    from strandssolver.test.stubs import stubhtmlreader
+    from strandssolver.test.stubs import stubhtmlreader, stubgamestate
     from strandssolver.parsers import htmlparser
     from timeit import timeit
 
-    parser = htmlparser.HTMLParser(html_reader=stubhtmlreader.StubHTMLReader())
-    game = parser.parse()
+    game = stubgamestate.StubGameState()
+    print(timeit(lambda: stubgamestate.StubGameState(), number=1))
     game.board.solved_states[[1, 2, 3], [1, 2, 3]] = True
 
     loop = 1000

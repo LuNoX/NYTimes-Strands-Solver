@@ -25,3 +25,13 @@ class StubGameState(gamestate.GameState):
                          theme=theme,
                          number_of_total_words=number_of_total_words,
                          number_of_solved_words=number_of_solved_words)
+
+
+def _test() -> None:
+    import cProfile
+    cProfile.run('StubGameState()')
+    # StubGameState()
+
+
+if __name__ == '__main__':
+    _test()

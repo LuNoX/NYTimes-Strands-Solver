@@ -6,11 +6,6 @@ from typing import List, Tuple, Set
 
 from strandssolver.models import gamestate
 
-from strandssolver.test.stubs import stubgraph
-from strandssolver.test.stubs import stubgamestate
-from strandssolver.test.stubs import stubdictionarytrie
-from timeit import timeit
-
 
 @dataclass
 class Solver:
@@ -66,10 +61,10 @@ class Solver:
 
         Examples
         --------
-        >>> G = nx.path_graph(5)
-        >>> list(nx.dfs_edges(G, source=0))
+         G = nx.path_graph(5)
+         list(nx.dfs_edges(G, source=0))
         [(0, 1), (1, 2), (2, 3), (3, 4)]
-        >>> list(nx.dfs_edges(G, source=0, depth_limit=2))
+         list(nx.dfs_edges(G, source=0, depth_limit=2))
         [(0, 1), (1, 2)]
 
         Notes
@@ -154,25 +149,14 @@ class Solver:
 
 
 def _test() -> None:
+    from strandssolver.test.stubs import stubgraph
+    from strandssolver.test.stubs import stubgamestate
+    from strandssolver.test.stubs import stubdictionarytrie
     graph = stubgraph.StubGraphBuilder.build_graph_from_board()
-    graph_time = timeit(stubgraph.StubGraphBuilder.build_graph_from_board,
-                        number=1)
-    game = stubgamestate.StubGameState()
-    game_time = timeit(stubgamestate.StubGameState, number=1)
-    trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
-    trie_time = timeit(
-        stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json,
-        number=1)
-    trie_time_from_dict = timeit(
-        stubdictionarytrie.StubDictionaryTrieBuilder.build_trie_from_dictionary,
-        number=1
-    )
-    print(f"graph_time: {graph_time}, "
-          f"game_time: {game_time}, "
-          f"trie_time: {trie_time}, "
-          f"trie_time_from_dict: {trie_time_from_dict}")
-    solver = Solver(graph=graph, game=game, trie=trie)
-    solver.solve()
+    # game = stubgamestate.StubGameState()
+    # trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
+    # solver = Solver(graph=graph, game=game, trie=trie)
+    # solver.solve()
 
 
 if __name__ == "__main__":

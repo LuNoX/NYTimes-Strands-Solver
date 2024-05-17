@@ -12,6 +12,10 @@ class StubHTMLReader(htmlreader.HTMLReader):
     DEFAULT_FILE_PATH = resources.files(data).joinpath(filenames.strands_html)
 
     @override
+    def __init__(self):
+        pass
+
+    @override
     def read(self, filepath: str | bytes | os.PathLike = None) -> str:
         if filepath is None:
             filepath = StubHTMLReader.DEFAULT_FILE_PATH
