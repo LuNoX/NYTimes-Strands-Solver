@@ -47,3 +47,15 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
         Stub method
         """
         pass
+
+
+def _test() -> None:
+    trie = StubDictionaryTrieBuilder.build_trie_from_dictionary()
+    trie_json = StubDictionaryTrieBuilder.load_trie_from_json()
+    print(trie_json == trie)
+    trie_json['blubbasbbsjhsjuhjksh'] = True
+    print(trie_json == trie)
+
+
+if __name__ == "__main__":
+    _test()

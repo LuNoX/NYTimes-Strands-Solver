@@ -1,17 +1,14 @@
 import cProfile
+from pstats import SortKey
 
 
 def test() -> None:
-    print(1)
-    from strandssolver.test.stubs import stubgraph
-    from strandssolver.test.stubs import stubgamestate
-    from strandssolver.test.stubs import stubdictionarytrie
-
-    graph = stubgraph.StubGraphBuilder.build_graph_from_board()
+    from strandssolver.test.stubs.stubdictionarytrie import _test
+    _test()
 
 
 def main() -> None:
-    cProfile.run("test()")
+    cProfile.run("test()", sort=SortKey.TIME)
 
 
 if __name__ == '__main__':

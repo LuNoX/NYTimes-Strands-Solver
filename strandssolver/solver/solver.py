@@ -153,9 +153,9 @@ def _test() -> None:
     from strandssolver.test.stubs import stubgamestate
     from strandssolver.test.stubs import stubdictionarytrie
     graph = stubgraph.StubGraphBuilder.build_graph_from_board()
-    # game = stubgamestate.StubGameState()
-    # trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
-    # solver = Solver(graph=graph, game=game, trie=trie)
+    game = stubgamestate.StubGameState()
+    trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
+    solver = Solver(graph=graph, game=game, trie=trie)
     # solver.solve()
 
 
