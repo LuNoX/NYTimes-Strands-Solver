@@ -20,7 +20,8 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
                                    ) -> pygtrie.CharTrie:
         if dictionary is None:
             dictionary = stubdictionary.StubDictionary()
-        return super().build_trie_from_dictionary(dictionary)
+        return super(StubDictionaryTrieBuilder, StubDictionaryTrieBuilder
+                     ).build_trie_from_dictionary(dictionary)
 
     @staticmethod
     @override
