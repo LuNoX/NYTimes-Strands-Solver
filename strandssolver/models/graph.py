@@ -85,7 +85,7 @@ class CharacterGraphBuilder:
 
 
 def _test() -> None:
-    from test.stubs import stubhtmlreader
+    from strandssolver.test.stubs import stubhtmlreader
     from strandssolver.parsers import htmlparser
     from timeit import timeit
 

@@ -4,8 +4,8 @@ from importlib import resources
 from typing import override
 
 from strandssolver.models import dictionary
-from test import data
-from test.data import filenames
+from strandssolver.test import data
+from strandssolver.test.data import filenames
 
 
 class StubDictionary(dictionary.Dictionary):

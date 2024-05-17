@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import pygtrie
 
@@ -8,9 +6,9 @@ from importlib import resources
 
 from strandssolver.models import dictionarytrie
 from strandssolver.models.dictionary import Dictionary
-from test import data
-from test.data import filenames
-from test.stubs import stubdictionary
+from strandssolver.test import data
+from strandssolver.test.data import filenames
+from strandssolver.test.stubs import stubdictionary
 
 
 class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):

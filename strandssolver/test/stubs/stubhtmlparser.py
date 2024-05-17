@@ -2,7 +2,7 @@ from typing import override
 
 from strandssolver.parsers import htmlparser
 from strandssolver.readers import reader
-from test.stubs import stubhtmlreader
+from strandssolver.test.stubs import stubhtmlreader
 
 
 class StubHTMLParser(htmlparser.HTMLParser):

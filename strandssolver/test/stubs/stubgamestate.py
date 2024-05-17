@@ -1,7 +1,7 @@
 from typing import override
 
 from strandssolver.models import gamestate
-from test.stubs import stubhtmlparser
+from strandssolver.test.stubs import stubhtmlparser
 
 
 class StubGameState(gamestate.GameState):

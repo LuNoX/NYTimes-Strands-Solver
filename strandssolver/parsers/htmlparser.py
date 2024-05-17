@@ -99,7 +99,7 @@ class HTMLParser(parser.Parser):
 
 
 def _test() -> None:
-    from test.stubs.stubhtmlreader import StubHTMLReader
+    from strandssolver.test.stubs.stubhtmlreader import StubHTMLReader
     html_parser = HTMLParser(html_reader=StubHTMLReader())
     print(html_parser.parse())
 

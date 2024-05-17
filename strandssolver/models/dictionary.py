@@ -42,8 +42,8 @@ class DictionaryBuilder:
 
 def _test() -> None:
     from importlib import resources
-    from test import data
-    from test.data import filenames
+    from strandssolver.test import data
+    from strandssolver.test.data import filenames
     word_dict_json = resources.files(data).joinpath(filenames.words_dictionary)
     dictionary = DictionaryBuilder.build_dictionary_from_json(
         word_dict_json,

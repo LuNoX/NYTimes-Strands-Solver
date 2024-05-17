@@ -2,7 +2,7 @@ import networkx as nx
 
 from typing import override
 
-from test.stubs import stubgamestate
+from strandssolver.test.stubs import stubgamestate
 from strandssolver.models import graph, gamestate
 
 

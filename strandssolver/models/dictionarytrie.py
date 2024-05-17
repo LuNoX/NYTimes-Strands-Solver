@@ -47,7 +47,7 @@ class DictionaryTrieBuilder:
 
 
 def _test() -> None:
-    from test.stubs import stubdictionary
+    from strandssolver.test.stubs import stubdictionary
     dictionary = stubdictionary.StubDictionary()
     trie = DictionaryTrieBuilder.build_trie_from_dictionary(dictionary)
     print(trie)
