@@ -28,82 +28,73 @@ def dfs_edges(
     )
 
     visited = set()
+    back_vertices = set()
     for start in nodes:
+        if start in visited:
+            continue
         try:
-            yield _single_start_node_dfs(start, depth_limit=depth_limit,
-                                         visited=visited,
-                                         get_children=get_children,
-                                         dfs_visitor=dfs_visitor)
+            visited.add(start)
+            stack = [(start, get_children(start))]
+            back_vertices.add(start)
+            depth_now = 1
+
+            while stack:
+                parent, children = stack[-1]
+                back_vertices.add(parent)
+                dfs_visitor.discover_vertex(parent)
+                for child in children:
+                    edge = (parent, child)
+                    if child not in visited:
+                        try:
+                            dfs_visitor.tree_edge(edge)
+                        except dfsexceptions.PruneSearch:
+                            continue
+                        yield parent, child
+                        visited.add(child)
+                        if depth_now < depth_limit:
+                            stack.append((child, get_children(child)))
+                            depth_now += 1
+                            break
+                    elif child in back_vertices:
+                        try:
+                            dfs_visitor.back_edge(edge)
+                        except dfsexceptions.PruneSearch:
+                            continue
+                    else:
+                        try:
+                            dfs_visitor.forward_or_cross_edge(edge)
+                        except dfsexceptions.PruneSearch:
+                            # Not really necessary since the edge was about to
+                            # be removed anyway, but better to not propagate an
+                            # exception
+                            continue
+                else:
+                    back_vertices.remove(parent)
+                    stack.pop()
+                    depth_now -= 1
+                    try:
+                        dfs_visitor.finish_vertex(parent)
+                    except dfsexceptions.PruneSearch:
+                        # Not really necessary since pruning on exit is
+                        # pointless, but better to not propagate an exception
+                        continue
         except dfsexceptions.StopSearch:
             return
         except dfsexceptions.NextSourceNode:
             continue
 
 
-def _single_start_node_dfs(
-        start: Node, depth_limit: int = None, visited: Set[Node] = None, *,
-        get_children: Callable[[Node], Iterable[Node]] = None,
-        dfs_visitor: dfsvisitor.DFSVisitor = None
-) -> Iterable[Edge]:
-    if visited is None:
-        visited = set()
-    if dfs_visitor is None:
-        dfs_visitor = dfsvisitor.IdleDFSVisitor()
-    if start in visited:
-        raise dfsexceptions.NextSourceNode()
-
-    visited.add(start)
-    stack = [(start, get_children(start))]
-    back_vertices = set(start)
-    depth_now = 1
-
-    while stack:
-        parent, children = stack[-1]
-        back_vertices.add(parent)
-        dfs_visitor.discover_vertex(parent)
-        for child in children:
-            edge = (parent, child)
-            if child not in visited:
-                try:
-                    dfs_visitor.tree_edge(edge)
-                except dfsexceptions.PruneSearch:
-                    continue
-                yield parent, child
-                visited.add(child)
-                if depth_now < depth_limit:
-                    stack.append((child, get_children(child)))
-                    depth_now += 1
-                    break
-            elif child in back_vertices:
-                try:
-                    dfs_visitor.back_edge(edge)
-                except dfsexceptions.PruneSearch:
-                    continue
-            else:
-                try:
-                    dfs_visitor.forward_or_cross_edge(edge)
-                except dfsexceptions.PruneSearch:
-                    # Not really necessary since the edge was about to be
-                    # removed anyway, but better to not raise an exception
-                    continue
-        else:
-            back_vertices.remove(parent)
-            stack.pop()
-            depth_now -= 1
-            # No need to check for prune because vertex was already removed
-            dfs_visitor.finish_vertex(parent)
-
-
 def _test() -> None:
     from strandssolver.test.stubs import stubgraph
     g = stubgraph.StubGraphBuilder.build_graph_from_board()
-    original = nx.dfs_edges(g, depth_limit=4)
-    print(list(original))
-    with_visitor = dfs_edges(g, depth_limit=4)
-    print(list(with_visitor))
-    difference = [a == b for a, b in zip(original, with_visitor)]
-    print(all(difference))
+    original = nx.dfs_edges(g)
+    original_list = list(original)
+    with_visitor = dfs_edges(g)
+    with_visitor_list = list(with_visitor)
+    difference = [a == b for a, b in zip(original_list, with_visitor_list)]
     print(difference)
+    print(all(difference))
+    print(len(with_visitor_list) == len(original_list))
 
 
 if __name__ == "__main__":
