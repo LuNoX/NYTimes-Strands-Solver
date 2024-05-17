@@ -1,5 +1,5 @@
-from typing import Any, Tuple, NewType
+from typing import Any, Tuple
 
-Vertex = NewType('Vertex', Any)
-Node = NewType('Node', Any)
-Edge = NewType('Edge', Tuple[Any, Any])
+type Vertex = Any
+type Node = Vertex
+type Edge = Tuple[Node, Node]
