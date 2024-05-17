@@ -1,6 +1,6 @@
 import networkx as nx
 
-from typing import Callable, Iterable, Set
+from typing import Callable, Iterable
 
 from strandssolver.dfs import dfsvisitor, dfsexceptions
 from strandssolver.dfs.typing import Node, Edge
@@ -28,20 +28,21 @@ def dfs_edges(
     )
 
     visited = set()
-    back_vertices = set()
+    completed = set()
     for start in nodes:
         if start in visited:
             continue
+        visited.add(start)
+        depth_now = 1
         try:
-            visited.add(start)
             stack = [(start, get_children(start))]
-            back_vertices.add(start)
-            depth_now = 1
 
             while stack:
                 parent, children = stack[-1]
-                back_vertices.add(parent)
-                dfs_visitor.discover_vertex(parent)
+                try:
+                    dfs_visitor.discover_vertex(parent)
+                except dfsexceptions.PruneSearch:
+                    children = []
                 for child in children:
                     edge = (parent, child)
                     if child not in visited:
@@ -55,21 +56,24 @@ def dfs_edges(
                             stack.append((child, get_children(child)))
                             depth_now += 1
                             break
-                    elif child in back_vertices:
-                        try:
-                            dfs_visitor.back_edge(edge)
-                        except dfsexceptions.PruneSearch:
-                            continue
-                    else:
+                    elif child in completed:
                         try:
                             dfs_visitor.forward_or_cross_edge(edge)
                         except dfsexceptions.PruneSearch:
-                            # Not really necessary since the edge was about to
-                            # be removed anyway, but better to not propagate an
-                            # exception
+                            # Not really necessary since the edge was not going
+                            # to be travelled anyway, but better to not
+                            # propagate an exception
+                            continue
+                    else:
+                        try:
+                            dfs_visitor.back_edge(edge)
+                        except dfsexceptions.PruneSearch:
+                            # Not really necessary since the edge was not going
+                            # to be travelled anyway, but better to not
+                            # propagate an exception
                             continue
                 else:
-                    back_vertices.remove(parent)
+                    completed.add(parent)
                     stack.pop()
                     depth_now -= 1
                     try:
