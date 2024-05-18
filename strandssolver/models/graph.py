@@ -10,6 +10,7 @@ from strandssolver.models import gamestate
 
 
 class CharacterGraphBuilder:
+    DEFAULT_KEY_FOR_CHARACTER = "character"
 
     @staticmethod
     def build_graph_from_board(board: gamestate.Board) -> nx.Graph:
@@ -17,8 +18,12 @@ class CharacterGraphBuilder:
             board.shape)
 
         it = np.nditer(board.characters, flags=['multi_index'])
-        node_attributes = {it.multi_index: {"character": str(character)}
-                           for character in it}
+        node_attributes = {
+            it.multi_index: {
+                CharacterGraphBuilder.DEFAULT_KEY_FOR_CHARACTER: str(character)
+            }
+            for character in it
+        }
         nx.set_node_attributes(graph, node_attributes)
 
         it = np.nditer(board.solved_states, flags=['multi_index'])
@@ -85,8 +90,7 @@ class CharacterGraphBuilder:
 
 
 def _test() -> None:
-    from strandssolver.test.stubs import stubhtmlreader, stubgamestate
-    from strandssolver.parsers import htmlparser
+    from strandssolver.test.stubs import stubgamestate
     from timeit import timeit
 
     game = stubgamestate.StubGameState()
