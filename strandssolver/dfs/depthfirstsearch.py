@@ -23,7 +23,7 @@ def _dfs_for_child(stack, parent, child, depth,
         if depth.depth_now < depth.depth_limit:
             stack.append((child, get_children(child)))
             depth.depth_now += 1
-            raise dfsexceptions.NextChild()
+            raise dfsexceptions.GoDeeper()
 
 
 def _finish_node(parent, completed, visited, stack, depth, dfs_visitor):
@@ -56,7 +56,7 @@ def _dfs_while_stack(stack, visited, completed, depth,
                                       get_children, dfs_visitor)
         except dfsexceptions.PruneSearch:
             continue
-        except dfsexceptions.NextChild:
+        except dfsexceptions.GoDeeper:
             break
     else:
         _finish_node(parent, completed, visited, stack, depth, dfs_visitor)

@@ -14,5 +14,5 @@ class StopSearch(DFSException):
     pass
 
 
-class NextChild(DFSException):
+class GoDeeper(DFSException):
     pass
