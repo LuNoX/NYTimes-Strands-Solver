@@ -124,11 +124,13 @@ def dfs_edges(
     kwargs["dfs_nodes"] = nodes
     if depth_limit is None:
         depth_limit = len(G)
+    kwargs["dfs_depth_limt"] = depth_limit
     if dfs_visitor is None:
         dfs_visitor = dfsvisitor.IdleDFSVisitor()
     if sort_neighbors is None:
         sort_neighbors = dfs_visitor.sort_neighbors
-    kwargs["sort_neighbors"] = sort_neighbors
+    kwargs["dfs_sort_neighbors"] = sort_neighbors
+    kwargs["dfs_G"] = G
 
     get_children = (
         lambda n, **inner_kwargs:
