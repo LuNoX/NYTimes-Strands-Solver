@@ -12,3 +12,7 @@ class PruneSearch(DFSException):
 
 class StopSearch(DFSException):
     pass
+
+
+class NextChild(DFSException):
+    pass
