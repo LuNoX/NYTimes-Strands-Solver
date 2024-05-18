@@ -141,6 +141,8 @@ def dfs_edges(
     # White := nodes that are neither in visited nor in completed
     visited = set()  # gray
     completed = set()  # black
+    kwargs["dfs_visited"] = visited
+    kwargs["dfs_completed"] = completed
     for start in nodes:
         try:
             yield from _dfs_edges_for_single_source_node(
