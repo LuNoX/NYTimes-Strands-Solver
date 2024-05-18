@@ -23,12 +23,13 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
                              'on empty path!'
                              'Path cannot be empty when backtracking.')
         steps_taken = 0
+        copy = self.current_path[::]
         while self.current_path[-1] != vertex:
             self.current_path.pop()
             steps_taken += 1
             if len(self.current_path) <= 0:
                 raise ValueError(f'Trying to backtrack to vertex "{vertex}" '
-                                 'on path but vertex was never encountered!'
+                                 f'on path {copy} but vertex was never encountered!'
                                  'Path must contain target vertex when '
                                  'backtracking.')
         return steps_taken
@@ -50,8 +51,9 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
     def discover_vertex(self, vertex: Vertex, **kwargs) -> None:
         self.current_path.append(vertex)
         self.current_prefix += self.get_character_from_vertex(vertex).lower()
+        if self.current_prefix == "kem":
+            pass
         if not self.trie.has_subtrie(self.current_prefix):
-            return
             raise dfsexceptions.PruneSearch
         if self.trie.has_key(self.current_prefix):
             self.words[tuple(self.current_path)] = self.current_prefix
@@ -68,5 +70,4 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
         _, destination = edge
         next_character = self.get_character_from_vertex(destination).lower()
         if not self.trie.has_subtrie(self.current_prefix + next_character):
-            return
             raise dfsexceptions.PruneSearch

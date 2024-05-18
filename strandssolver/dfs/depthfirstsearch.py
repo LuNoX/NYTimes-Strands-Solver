@@ -26,7 +26,7 @@ def _dfs_for_child(parent: Node, child: Node,
     else:
         dfs_visitor.tree_edge(edge, **kwargs)
         yield parent, child
-        visited.add(child)
+        # visited.add(child)
         if depth.depth_now < depth.depth_limit:
             stack.append((child, get_children(child, **kwargs)))
             depth.depth_now += 1
@@ -60,15 +60,17 @@ def _dfs_while_stack(stack: List[Tuple[Node, Iterable[Node]]],
     parent, children = stack[-1]
     kwargs["dfs_parent"] = parent
     kwargs["dfs_children"] = children
-    try:
-        dfs_visitor.discover_vertex(parent, **kwargs)
-    except dfsexceptions.PruneSearch:
-        _finish_node(parent=parent, stack=stack,
-                     completed=completed, visited=visited,
-                     depth=depth,
-                     dfs_visitor=dfs_visitor,
-                     **kwargs)
-        return
+    if parent not in visited:
+        try:
+            visited.add(parent)
+            dfs_visitor.discover_vertex(parent, **kwargs)
+        except dfsexceptions.PruneSearch:
+            _finish_node(parent=parent, stack=stack,
+                         completed=completed, visited=visited,
+                         depth=depth,
+                         dfs_visitor=dfs_visitor,
+                         **kwargs)
+            return
     for child in children:
         try:
             yield from _dfs_for_child(parent=parent, child=child, stack=stack,
@@ -95,7 +97,7 @@ def _dfs_edges_for_single_source_node(
         **kwargs) -> Iterable[Edge]:
     if start in visited:
         raise dfsexceptions.NextSourceNode()
-    visited.add(start)
+    # visited.add(start)
     depth = dfsdepth.Depth(depth_limit=depth_limit)
     kwargs["dfs_depth"] = depth
     stack = [(start, get_children(start, **kwargs))]
@@ -160,16 +162,18 @@ def dfs_edges(
 def _test() -> None:
     from strandssolver.test.stubs import stubgraph
     g = stubgraph.StubGraphBuilder.build_graph_from_board()
-    original = nx.dfs_edges(g, depth_limit=20)
-    original_list = list(original)
+    original = nx.dfs_edges(g)
+    original_list = set(original)
     print(original_list)
-    with_visitor = dfs_edges(g, depth_limit=20)
-    with_visitor_list = list(with_visitor)
+    with_visitor = dfs_edges(g)
+    with_visitor_list = set(with_visitor)
     print(with_visitor_list)
     difference = [a == b for a, b in zip(original_list, with_visitor_list)]
     print(difference)
     print(all(difference))
     print(len(with_visitor_list) == len(original_list))
+    print(with_visitor_list - original_list)
+    print(original_list - with_visitor_list)
 
 
 if __name__ == "__main__":
