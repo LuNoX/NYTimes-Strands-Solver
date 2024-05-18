@@ -39,7 +39,8 @@ def find_all_paths_for_node(graph: nx.Graph, node: Node,
                             dfs_visitor: strandsdfsvisitor.StrandsDFSVisitor
                             ) -> None:
     edges = depthfirstsearch.dfs_edges(graph, node, dfs_visitor=dfs_visitor)
-    print(f"node: {node}, edges: {list(edges)}")
+    a = list(edges)
+    print(node)
     print(dfs_visitor.words)
 
 
@@ -47,8 +48,8 @@ def _test() -> None:
     from strandssolver.test.stubs import stubgraph
     from strandssolver.test.stubs import stubgamestate
     from strandssolver.test.stubs import stubdictionarytrie
-    graph = stubgraph.StubGraphBuilder.build_graph_from_board()
-    game = stubgamestate.StubGameState()
+    graph = stubgraph.StubGraphBuilder.build_small_graph()
+    game = stubgamestate.StubSmallGameState()
     trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
 
     # graph = nx.grid_2d_graph(m=4, n=4)

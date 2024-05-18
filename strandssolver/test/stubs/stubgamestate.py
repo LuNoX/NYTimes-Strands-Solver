@@ -1,3 +1,5 @@
+import numpy as np
+
 from typing import override
 
 from strandssolver.models import gamestate
@@ -27,10 +29,19 @@ class StubGameState(gamestate.GameState):
                          number_of_solved_words=number_of_solved_words)
 
 
+class StubSmallGameState(gamestate.GameState):
+    def __init__(self) -> None:
+        characters = "kenaerromiigutnt"
+        char_array = np.array(list(characters))
+        char_array = char_array.reshape((4, 4))
+        self.board = gamestate.Board(char_array)
+        self.theme = "Testing"
+        self.number_of_total_words = 7
+        self.number_of_solved_words = 0
+
+
 def _test() -> None:
-    import cProfile
-    cProfile.run('StubGameState()')
-    # StubGameState()
+    print(StubSmallGameState())
 
 
 if __name__ == '__main__':

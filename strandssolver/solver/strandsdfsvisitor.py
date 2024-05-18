@@ -41,30 +41,32 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
         return self.graph.nodes[vertex][key_for_character]
 
     def travel_edge(self, edge: Edge) -> None:
-        origin, destination = edge
+        origin, _ = edge
         steps_backtracked = self.backtrack_until_vertex(origin)
-        self.current_prefix = self.current_prefix[:-steps_backtracked]
-        self.current_path.append(destination)
-        self.current_prefix += self.get_character_from_vertex(destination)
+        if steps_backtracked > 0:
+            self.current_prefix = self.current_prefix[:-steps_backtracked]
 
     @override
     def discover_vertex(self, vertex: Vertex, **kwargs) -> None:
         self.current_path.append(vertex)
         self.current_prefix += self.get_character_from_vertex(vertex).lower()
         if not self.trie.has_subtrie(self.current_prefix):
+            return
             raise dfsexceptions.PruneSearch
+        if self.trie.has_key(self.current_prefix):
+            self.words[tuple(self.current_path)] = self.current_prefix
 
     @override
     def finish_vertex(self, vertex: Vertex, **kwargs) -> None:
         kwargs['dfs_completed'].remove(vertex)
-        if self.trie.has_key(self.current_prefix):
-            self.words[tuple(self.current_path)] = self.current_prefix
         self.current_path.pop()
         self.current_prefix = self.current_prefix[:-1]
 
     @override
     def tree_edge(self, edge: Edge, **kwargs) -> None:
+        self.travel_edge(edge)
         _, destination = edge
         next_character = self.get_character_from_vertex(destination).lower()
         if not self.trie.has_subtrie(self.current_prefix + next_character):
+            return
             raise dfsexceptions.PruneSearch
