@@ -26,6 +26,7 @@ class BinaryOptimizer:
     DEFAULT_NORM = pulp.lpSum
 
     def __init__(self, problem: ProblemType = None, target: TargetType = None,
+                 max_input_vector_sum: int = None,
                  norm: Callable[[ResidualType], float] = None) -> None:
         self._target: BinaryOptimizer.TargetType = None
         self.target = target
@@ -34,6 +35,7 @@ class BinaryOptimizer:
         if norm is None:
             norm = BinaryOptimizer.DEFAULT_NORM
         self.norm = norm
+        self.max_input_vector_sum = max_input_vector_sum
 
     @property
     def target(self) -> BinaryOptimizer.TargetType:
@@ -79,14 +81,17 @@ class BinaryOptimizer:
                      for i in range(n)]
 
         residuals_abs = [pulp.LpVariable(f'r_abs_{i}', lowBound=0)
-                         for i in range(m)]
+                         for i in range(n)]
 
-        for i in range(m):
+        for i in range(n):
             optimization += residuals_abs[i] >= residuals[i]
             optimization += residuals_abs[i] >= -residuals[i]
 
         objective = self.norm(residuals_abs)
         optimization += objective
+
+        if self.max_input_vector_sum is not None:
+            optimization += pulp.lpSum(x) <= self.max_input_vector_sum
 
         optimization.solve()
 
@@ -102,8 +107,9 @@ def convert_words_to_problem_matrix(words: Iterable[Tuple[Tuple[int, ...]]],
     for word in words:
         vector = np.zeros(len(nodes), dtype=np.bool_)
         node_indices_in_word = [index_per_node[node] for node in word]
-        vector = vector[node_indices_in_word] = True
-        problem.append(vector)
+        vector[node_indices_in_word] = True
+        problem.append(vector.T)
+    problem = np.array(problem).T
     return problem
 
 

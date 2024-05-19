@@ -13,7 +13,6 @@ class StubGraphBuilder(graph.CharacterGraphBuilder):
     def build_graph_from_board(board: gamestate.Board = None) -> nx.Graph:
         if board is None:
             game = stubgamestate.StubGameState()
-            game.board.solved_states[[1, 2, 3], [1, 2, 3]] = True
             board = game.board
         return super(StubGraphBuilder, StubGraphBuilder
                      ).build_graph_from_board(board)
