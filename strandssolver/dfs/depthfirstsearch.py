@@ -161,11 +161,12 @@ def dfs_edges(
 
 def _test() -> None:
     from strandssolver.test.stubs import stubgraph
-    g = stubgraph.StubGraphBuilder.build_graph_from_board()
-    original = nx.dfs_edges(g)
+    g = stubgraph.StubGraphBuilder.build_small_graph()
+    depth_limit = 4
+    original = nx.dfs_edges(g, depth_limit=depth_limit)
     original_list = set(original)
     print(original_list)
-    with_visitor = dfs_edges(g)
+    with_visitor = dfs_edges(g, depth_limit=depth_limit)
     with_visitor_list = set(with_visitor)
     print(with_visitor_list)
     difference = [a == b for a, b in zip(original_list, with_visitor_list)]

@@ -1,13 +1,13 @@
 import networkx as nx
+import numpy as np
 import pygtrie
-import multiprocessing as mp
-import itertools
+import collections
 
 from dataclasses import dataclass
 from typing import List, Tuple, Set
 
 from strandssolver.models import gamestate
-from strandssolver.solver import strandsdfsvisitor
+from strandssolver.solver import strandsdfsvisitor, optimizecovering
 from strandssolver.dfs import depthfirstsearch
 from strandssolver.dfs.typing import Node
 
@@ -19,7 +19,8 @@ class Solver:
     trie: pygtrie.Trie
 
     def solve(self) -> List[Set[Tuple[int, ...]]]:
-        self.find_all_words()
+        words = self.find_all_words()
+        covering = self.find_best_covering(words)
 
     def find_all_words(self) -> List[Tuple[str, List[Tuple[int, ...]]]]:
         words = []
@@ -30,11 +31,21 @@ class Solver:
             edges = depthfirstsearch.dfs_edges(self.graph, source=node,
                                                depth_limit=8,
                                                dfs_visitor=visitor)
-            list(edges)
-            print(node)
-            print(visitor.words)
+            # Exhaust the iterator so the visitor builds all words
+            collections.deque(edges, maxlen=0)
+            words.extend(visitor.words.keys())
 
         return words
+
+    def find_best_covering(self, words):
+        problem = optimizecovering.convert_words_to_problem_matrix(words,
+                                                                   self.graph)
+        target = np.ones(len(self.graph.nodes), dtype=np.bool_)
+        optimizer = optimizecovering.BinaryOptimizer(problem, target)
+        solution = optimizer.optimize_binary_vector()
+        solution = optimizecovering.convert_problem_solution_to_words(solution,
+                                                                      words)
+        return solution
 
 
 def find_all_paths_for_node(graph: nx.Graph, node: Node,
@@ -68,4 +79,4 @@ def _profile() -> None:
 
 
 if __name__ == "__main__":
-    _profile()
+    _test()
