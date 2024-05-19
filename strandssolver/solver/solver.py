@@ -63,7 +63,6 @@ def _test() -> None:
     from strandssolver.test.stubs import stubgraph
     from strandssolver.test.stubs import stubgamestate
     from strandssolver.test.stubs import stubdictionarytrie
-    from matplotlib import pyplot as plt
     graph = stubgraph.StubGraphBuilder.build_graph_from_board()
     game = stubgamestate.StubGameState()
     trie = stubdictionarytrie.StubDictionaryTrieBuilder.load_trie_from_json()
@@ -75,25 +74,6 @@ def _test() -> None:
         for node in word:
             string += graph.nodes[node]["character"]
         print(string)
-
-    pos = nx.spring_layout(graph)
-    nx.draw_networkx_nodes(graph, pos=pos)
-    nx.draw_networkx_labels(graph,
-                            labels={node: data["character"]
-                                    for node, data in graph.nodes(data=True)},
-                            pos=pos)
-    cm = plt.get_cmap('gist_rainbow')
-    colors = (cm(x) for x in np.linspace(0, 1, len(solution)))
-    for word, color in zip(solution, colors):
-        print(color)
-        r, g, b, _ = color
-        color = (r, g, b)
-        edgelist = [(word[i], word[i + 1]) for i in range(len(word) - 1)]
-        nx.draw_networkx_edges(graph, edgelist=edgelist, pos=pos,
-                               edge_color=color, width=4)
-        nx.draw_networkx_nodes(graph, nodelist=[word[0]], pos=pos,
-                               node_color=color, node_size=200)
-    plt.show()
 
 
 def _profile() -> None:
