@@ -18,12 +18,12 @@ class Solver:
     game: gamestate.GameState
     trie: pygtrie.Trie
 
-    def solve(self) -> List[Tuple[Tuple[int, ...]]]:
+    def solve(self) -> List[Tuple[Node]]:
         words = self.find_all_words()
         covering = self.find_best_covering(words)
         return list(covering)
 
-    def find_all_words(self) -> List[Tuple[Tuple[int, ...]]]:
+    def find_all_words(self) -> List[Tuple[Node]]:
         words = []
 
         for node in self.graph.nodes():
@@ -38,8 +38,8 @@ class Solver:
 
         return words
 
-    def find_best_covering(self, words: Iterable[Tuple[Tuple[int, ...]]]
-                           ) -> Iterable[Tuple[Tuple[int, ...]]]:
+    def find_best_covering(self, words: Iterable[Tuple[Node]]
+                           ) -> Iterable[Tuple[Node]]:
         problem = optimizecovering.convert_words_to_problem_matrix(words,
                                                                    self.graph)
         target = np.ones(len(self.graph.nodes), dtype=np.bool_).T
@@ -77,7 +77,7 @@ def _test() -> None:
         print(string)
 
     pos = nx.spring_layout(graph)
-    nx.draw(graph, pos=pos)
+    nx.draw_networkx_nodes(graph, pos=pos)
     nx.draw_networkx_labels(graph,
                             labels={node: data["character"]
                                     for node, data in graph.nodes(data=True)},
