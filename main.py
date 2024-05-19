@@ -1,5 +1,4 @@
 import networkx as nx
-import numpy as np
 
 from matplotlib import pyplot as plt
 
@@ -33,17 +32,13 @@ def main() -> None:
                                     for node, data in
                                     game_graph.nodes(data=True)},
                             pos=pos)
-    cm = plt.get_cmap('gist_rainbow')
-    colors = (cm(x) for x in np.linspace(0, 1, len(solution)))
-    for word, color in zip(solution, colors):
-        print(color)
-        r, g, b, _ = color
-        color = (r, g, b)
+
+    for word in solution:
         edgelist = [(word[i], word[i + 1]) for i in range(len(word) - 1)]
         nx.draw_networkx_edges(game_graph, edgelist=edgelist, pos=pos,
-                               edge_color=color, width=4)
+                               edge_color="b", width=4)
         nx.draw_networkx_nodes(game_graph, nodelist=[word[0]], pos=pos,
-                               node_color=color, node_size=200)
+                               node_color="r", node_size=200)
     plt.show()
 
 
