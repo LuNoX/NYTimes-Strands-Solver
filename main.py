@@ -57,7 +57,7 @@ def main() -> None:
         print(f"{ranked_covering.score:.2f}: {', '.join(words)}")
     solution = ranked_coverings[0].covering
 
-    pos = nx.spring_layout(game_graph)
+    pos = {(row, column): (column, -row) for row, column in game_graph.nodes}
     nx.draw_networkx_nodes(game_graph, pos=pos)
     nx.draw_networkx_labels(
         game_graph,
@@ -73,6 +73,8 @@ def main() -> None:
         nx.draw_networkx_nodes(
             game_graph, nodelist=[word[0]], pos=pos, node_color="r", node_size=200
         )
+    plt.gca().set_aspect("equal")
+    plt.axis("off")
     plt.show()
 
 
