@@ -1,5 +1,6 @@
 import networkx as nx
 import more_itertools
+import pygtrie
 import sys
 
 from typing import Optional
@@ -9,8 +10,10 @@ from matplotlib import pyplot as plt
 from strandssolver.solver import rankcovering, solver
 from strandssolver.readers import htmlreader, jsonreader
 from strandssolver.parsers import htmlparser, jsonparser
-from strandssolver.models import gamestate, graph, dictionarytrie
+from strandssolver.models import gamestate, graph, dictionary, dictionarytrie
 from strandssolver.test.data import filepaths
+
+MINIMUM_WORD_LENGTH = 4
 
 
 def read_game() -> Optional[gamestate.GameState]:
@@ -40,14 +43,34 @@ def describe(error: Exception) -> str:
     return f"{type(error).__name__}: {first_line}"
 
 
+def load_trie() -> pygtrie.Trie:
+    minimum_zipf_frequency = dictionary.DictionaryBuilder.DEFAULT_MINIMUM_ZIPF_FREQUENCY
+    cache_path = filepaths.data_directory / (
+        f"words_trie_cache_zipf{minimum_zipf_frequency}_min{MINIMUM_WORD_LENGTH}.json"
+    )
+
+    def build_trie() -> pygtrie.Trie:
+        trie = dictionarytrie.DictionaryTrieBuilder.load_trie_from_json(
+            filepaths.words_trie_path, cast_to=pygtrie.CharTrie
+        )
+        common_words = dictionary.DictionaryBuilder.build_dictionary_from_wordfreq(
+            minimum_zipf_frequency=minimum_zipf_frequency,
+            filter_condition=lambda word: len(word) >= MINIMUM_WORD_LENGTH,
+        )
+        dictionarytrie.DictionaryTrieBuilder.add_dictionary_to_trie(trie, common_words)
+        return trie
+
+    return dictionarytrie.DictionaryTrieBuilder.load_or_build_trie(
+        cache_path, build_trie
+    )
+
+
 def main() -> None:
     game = read_game()
     if game is None:
         sys.exit("Could not load today's puzzle")
     game_graph = graph.CharacterGraphBuilder.build_graph_from_board(game.board)
-    trie = dictionarytrie.DictionaryTrieBuilder.load_trie_from_json(
-        filepaths.words_trie_path
-    )
+    trie = load_trie()
 
     game_solver = solver.Solver(graph=game_graph, game=game, trie=trie)
     ranked_coverings = game_solver.solve()

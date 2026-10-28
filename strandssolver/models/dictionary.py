@@ -1,5 +1,6 @@
 import os
 import json
+import wordfreq
 
 from typing import Iterable, Iterator, Callable, Set, Optional
 from dataclasses import dataclass
@@ -22,6 +23,9 @@ class Dictionary:
 
 
 class DictionaryBuilder:
+    DEFAULT_WORDFREQ_LANGUAGE = "en"
+    DEFAULT_MINIMUM_ZIPF_FREQUENCY = 3.0
+
     @staticmethod
     def load_keys_from_json(path: str | bytes | os.PathLike) -> Set[str]:
         with open(path, "rb") as f:
@@ -35,6 +39,26 @@ class DictionaryBuilder:
         filter_condition: Optional[Callable[[str], bool]] = None,
     ) -> Dictionary:
         words = DictionaryBuilder.load_keys_from_json(path)
+        if filter_condition is None:
+            return Dictionary(words)
+        return Dictionary(words, filter_condition)
+
+    @staticmethod
+    def build_dictionary_from_wordfreq(
+        language: Optional[str] = None,
+        minimum_zipf_frequency: Optional[float] = None,
+        filter_condition: Optional[Callable[[str], bool]] = None,
+    ) -> Dictionary:
+        if language is None:
+            language = DictionaryBuilder.DEFAULT_WORDFREQ_LANGUAGE
+        if minimum_zipf_frequency is None:
+            minimum_zipf_frequency = DictionaryBuilder.DEFAULT_MINIMUM_ZIPF_FREQUENCY
+        words: Set[str] = set()
+        for word in wordfreq.iter_wordlist(language):
+            if wordfreq.zipf_frequency(word, language) < minimum_zipf_frequency:
+                break
+            if word.isascii() and word.isalpha():
+                words.add(word)
         if filter_condition is None:
             return Dictionary(words)
         return Dictionary(words, filter_condition)

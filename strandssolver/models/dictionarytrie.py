@@ -2,7 +2,7 @@ import pygtrie
 import os
 import json
 
-from typing import Type, Optional
+from typing import Callable, Type, Optional
 
 from strandssolver.models.dictionary import Dictionary
 
@@ -15,9 +15,13 @@ class DictionaryTrieBuilder:
     @staticmethod
     def build_trie_from_dictionary(dictionary: Dictionary) -> pygtrie.CharTrie:
         trie = pygtrie.CharTrie()
+        DictionaryTrieBuilder.add_dictionary_to_trie(trie, dictionary)
+        return trie
+
+    @staticmethod
+    def add_dictionary_to_trie(trie: pygtrie.Trie, dictionary: Dictionary) -> None:
         for word in dictionary:
             trie[word] = True
-        return trie
 
     @staticmethod
     def store_trie_as_json(
@@ -48,6 +52,18 @@ class DictionaryTrieBuilder:
         with open(path, "r", encoding=encoding) as f:
             trie_dict = json.load(f)
             return cast_to(trie_dict)
+
+    @staticmethod
+    def load_or_build_trie(
+        path: str | bytes | os.PathLike, build_trie: Callable[[], pygtrie.Trie]
+    ) -> pygtrie.Trie:
+        if os.path.exists(path):
+            return DictionaryTrieBuilder.load_trie_from_json(path)
+        trie = build_trie()
+        temporary_path = os.fsdecode(path) + ".tmp"
+        DictionaryTrieBuilder.store_trie_as_json(trie, temporary_path)
+        os.replace(temporary_path, path)
+        return trie
 
 
 def _test() -> None:
