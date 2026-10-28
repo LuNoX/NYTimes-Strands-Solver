@@ -64,7 +64,7 @@ class HTMLParser(parser.Parser):
         </div>
         '''
         board = self.soup.find("div", attrs={"class": 'UOpmtW_board'})
-        buttons = board.findAll("button", attrs={"class": 'pRjvKq_item'})
+        buttons = board.find_all("button", attrs={"class": 'pRjvKq_item'})
 
         letters = []
         for button in buttons:
@@ -94,7 +94,7 @@ class HTMLParser(parser.Parser):
         hint = self.soup.find(id='hint')
         paragraph = hint.find("p", recursive=False)
         solved = paragraph.find("b")
-        total = solved.findNextSibling()
+        total = solved.find_next_sibling()
         return int(solved.text), int(total.text)
 
 

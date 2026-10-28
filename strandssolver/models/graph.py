@@ -39,7 +39,8 @@ class CharacterGraphBuilder:
         for node in graph:
             neighbours = CharacterGraphBuilder.valid_neighbour_indices(
                 node, shape, only_diagonals=True)
-            edges = [(node, tuple(neighbour)) for neighbour in neighbours]
+            edges = [(node, tuple(neighbour.tolist()))
+                     for neighbour in neighbours]
             graph.add_edges_from(edges)
 
         return graph

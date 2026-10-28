@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 import numpy.typing
-import nptyping
 import pulp
 import networkx as nx
 
@@ -18,9 +17,9 @@ class BinaryOptimizer:
     x: the (m x 1) binary input vector
     b: the (n x 1) binary target vector
     """
-    type ProblemType = nptyping.NDArray[nptyping.Shape["*, *"], nptyping.Bool]
-    type InputType = nptyping.NDArray[nptyping.Shape["*"], nptyping.Bool]
-    type TargetType = nptyping.NDArray[nptyping.Shape["*"], nptyping.Bool]
+    type ProblemType = np.ndarray[tuple[int, int], np.dtype[np.bool_]]
+    type InputType = np.ndarray[tuple[int], np.dtype[np.bool_]]
+    type TargetType = np.ndarray[tuple[int], np.dtype[np.bool_]]
     type ResidualType = BinaryOptimizer.TargetType
 
     DEFAULT_NORM = pulp.lpSum
@@ -46,10 +45,7 @@ class BinaryOptimizer:
     @target.setter
     def target(self, target: np.typing.ArrayLike | BinaryOptimizer.TargetType
                ) -> None:
-        if not isinstance(target, nptyping.NDArray[nptyping.Shape["*"],
-        nptyping.Bool]):
-            target = np.array(target, dtype=np.bool_)
-        self._target = target
+        self._target = np.asarray(target, dtype=np.bool_)
 
     @property
     def problem(self) -> BinaryOptimizer.ProblemType:
@@ -61,9 +57,7 @@ class BinaryOptimizer:
     def problem(self,
                 problem: np.typing.ArrayLike | BinaryOptimizer.ProblemType
                 ) -> None:
-        if not isinstance(problem, nptyping.NDArray[nptyping.Shape["*, *"],
-        nptyping.Bool]):
-            problem = np.array(problem, dtype=np.bool_)
+        problem = np.asarray(problem, dtype=np.bool_)
         if problem.ndim != 2:
             shape = (self.target.shape[0], -1)
             problem = problem.reshape(shape)
@@ -75,12 +69,13 @@ class BinaryOptimizer:
         n, m = A.shape
 
         optimization = pulp.LpProblem("Binary_Optimization", pulp.LpMinimize)
-        x = [pulp.LpVariable(f'x_{i}', cat=pulp.LpBinary) for i in range(m)]
+        x = [optimization.add_variable(f'x_{i}', cat=pulp.LpBinary)
+             for i in range(m)]
         # Define the residual vector r = Ax - b
-        residuals = [pulp.lpSum(A[i, j] * x[j] for j in range(m)) - b[i]
+        residuals = [pulp.lpSum(x[j] for j in range(m) if A[i, j]) - int(b[i])
                      for i in range(n)]
 
-        residuals_abs = [pulp.LpVariable(f'r_abs_{i}', lowBound=0)
+        residuals_abs = [optimization.add_variable(f'r_abs_{i}', lowBound=0)
                          for i in range(n)]
 
         for i in range(n):
