@@ -30,7 +30,6 @@ class Solver:
             visitor = strandsdfsvisitor.StrandsDFSVisitor(self.graph,
                                                           self.trie)
             edges = depthfirstsearch.dfs_edges(self.graph, source=node,
-                                               depth_limit=8,
                                                dfs_visitor=visitor)
             # Exhaust the iterator so the visitor builds all words
             collections.deque(edges, maxlen=0)

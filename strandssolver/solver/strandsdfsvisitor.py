@@ -53,7 +53,7 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
         self.current_prefix += self.get_character_from_vertex(vertex).lower()
         if self.current_prefix == "kem":
             pass
-        if not self.trie.has_subtrie(self.current_prefix):
+        if not self.trie.has_node(self.current_prefix):
             raise dfsexceptions.PruneSearch
         if self.trie.has_key(self.current_prefix):
             self.words[tuple(self.current_path)] = self.current_prefix
@@ -69,5 +69,5 @@ class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
         self.travel_edge(edge)
         _, destination = edge
         next_character = self.get_character_from_vertex(destination).lower()
-        if not self.trie.has_subtrie(self.current_prefix + next_character):
+        if not self.trie.has_node(self.current_prefix + next_character):
             raise dfsexceptions.PruneSearch
