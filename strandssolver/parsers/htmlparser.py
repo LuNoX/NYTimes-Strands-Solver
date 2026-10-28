@@ -1,4 +1,5 @@
 import bs4
+import re
 
 from typing import Tuple, override
 
@@ -44,27 +45,25 @@ class HTMLParser(parser.Parser):
 
     def _parse_board(self) -> gamestate.Board:
         '''
-        <div class="UOpmtW_board">
-           <div class="F9LmoG_standard" ... data-flip-id="pulser-0" ... >
-              <button class="pRjvKq_item"
+        <form class="styles-module_wrapper__A7No7" data-testid="strands-board">
+           ...
+              <button class="styles-module_item__ZXXc7"
                   type="button"
-                  id="button-0">
+                  id="button-0"
+                  data-testid="strands-letter-0">
                       O
               </button>
-           </div>
            ...
-           </div>
-           <div class="F9LmoG_standard" ... data-flip-id="pulser-47" ... >
-              <button class="pRjvKq_item"
+              <button class="styles-module_item__ZXXc7"
                   type="button"
-                  id="button-47">
+                  id="button-47"
+                  data-testid="strands-letter-47">
                       P
               </button>
-           </div>
-        </div>
+           ...
+        </form>
         '''
-        board = self.soup.find("div", attrs={"class": 'UOpmtW_board'})
-        buttons = board.find_all("button", attrs={"class": 'pRjvKq_item'})
+        buttons = self.soup.find_all("button", id=re.compile(r"^button-\d+$"))
 
         letters = []
         for button in buttons:
@@ -79,8 +78,14 @@ class HTMLParser(parser.Parser):
         return board
 
     def _parse_theme(self) -> str:
-        # <h1 class="umfyna_clue">theme</h1>
-        theme = self.soup.find('h1', attrs={'class': 'umfyna_clue'})
+        # <section id="riddle">
+        #   <h2>
+        #     <span class="riddle-module_label__OY9sx">today’s theme</span>
+        #     <span class="visually-hidden">:</span>
+        #     <span class="riddle-module_clue__DAHxH">theme</span>
+        #   </h2>
+        # </section>
+        theme = self.soup.select_one('#riddle [class*="clue"]')
         return theme.text
 
     def _parse_word_counts(self) -> Tuple[int, int]:

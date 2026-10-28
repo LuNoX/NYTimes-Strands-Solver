@@ -1,18 +1,42 @@
 import networkx as nx
+import sys
 
 from matplotlib import pyplot as plt
 
 from strandssolver.solver import solver
-from strandssolver.readers import htmlreader
-from strandssolver.parsers import htmlparser
-from strandssolver.models import graph, dictionarytrie
+from strandssolver.readers import htmlreader, jsonreader
+from strandssolver.parsers import htmlparser, jsonparser
+from strandssolver.models import gamestate, graph, dictionarytrie
 from strandssolver.test.data import filepaths
 
 
+def read_game() -> gamestate.GameState | None:
+    try:
+        json_reader = jsonreader.JSONReader()
+        return jsonparser.JSONParser(json_reader=json_reader).parse()
+    except Exception as error:
+        print(f"Could not load the puzzle from the NYT API "
+              f"({describe(error)}), trying the website instead",
+              file=sys.stderr)
+    try:
+        html_reader = htmlreader.HTMLReader()
+        return htmlparser.HTMLParser(html_reader=html_reader).parse()
+    except Exception as error:
+        print(f"Could not load the puzzle from the website "
+              f"({describe(error)})", file=sys.stderr)
+    return None
+
+
+def describe(error: Exception) -> str:
+    # Selenium appends a stacktrace to its error messages
+    first_line = next(iter(str(error).splitlines()), "")
+    return f"{type(error).__name__}: {first_line}"
+
+
 def main() -> None:
-    reader = htmlreader.HTMLReader()
-    parser = htmlparser.HTMLParser(html_reader=reader)
-    game = parser.parse()
+    game = read_game()
+    if game is None:
+        sys.exit("Could not load today's puzzle")
     game_graph = graph.CharacterGraphBuilder.build_graph_from_board(game.board)
     trie = dictionarytrie.DictionaryTrieBuilder.load_trie_from_json(
         filepaths.words_trie_path)

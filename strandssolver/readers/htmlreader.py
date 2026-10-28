@@ -3,7 +3,12 @@ import asyncio
 from typing import override, List
 import datetime
 from selenium import webdriver
+from selenium.common.exceptions import (ElementClickInterceptedException,
+                                        ElementNotInteractableException,
+                                        StaleElementReferenceException)
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from strandssolver.readers import reader
 
@@ -14,6 +19,10 @@ class HTMLReader(reader.Reader):
     DEFAULT_TIME_BETWEEN_ATTEMPTS = 5.0
     DEFAULT_WEBDRIVER_ARGUMENTS = ["--headless=new"]
     DEFAULT_LOAD_COMPLETE_WHEN_HTML_CONTAINS_THIS = "TODAY’S THEME"
+    DEFAULT_SECONDS_TO_START_GAME = 20.0
+    REJECT_COOKIES_BUTTON_SELECTOR = "#fides-reject-all-button"
+    PLAY_BUTTON_SELECTOR = "[data-testid='moment-btn-play']"
+    BOARD_SELECTOR = "[data-testid='strands-board']"
 
     def __init__(self,
                  url: str | bytes = DEFAULT_URL,
@@ -58,8 +67,30 @@ class HTMLReader(reader.Reader):
         if url is None:
             url = self.url
         self.webdriver.get(url)
+        self._start_game()
         html = asyncio.run(self._get_html_source())
         return html
+
+    def _start_game(self) -> None:
+        # The cookie banner and Play can show up in either order
+        def board_is_shown(driver: webdriver.Chrome) -> bool:
+            if driver.find_elements(By.CSS_SELECTOR,
+                                    HTMLReader.BOARD_SELECTOR):
+                return True
+            for selector in (HTMLReader.REJECT_COOKIES_BUTTON_SELECTOR,
+                             HTMLReader.PLAY_BUTTON_SELECTOR):
+                for button in driver.find_elements(By.CSS_SELECTOR, selector):
+                    if button.is_displayed():
+                        button.click()
+            return False
+
+        WebDriverWait(
+            self.webdriver,
+            HTMLReader.DEFAULT_SECONDS_TO_START_GAME,
+            ignored_exceptions=[ElementClickInterceptedException,
+                                ElementNotInteractableException,
+                                StaleElementReferenceException]
+        ).until(board_is_shown)
 
     async def _get_html_source(self) -> str:
         html = self.webdriver.page_source
