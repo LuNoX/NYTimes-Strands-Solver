@@ -30,13 +30,15 @@ class CoveringRanker:
             return 0.0
         return statistics.fmean(scores)
 
-    def rank(self, coverings: Iterable[List[Tuple[Node, ...]]],
-             spell: Callable[[Tuple[Node, ...]], str]
-             ) -> List[RankedCovering]:
+    def rank(
+        self,
+        coverings: Iterable[List[Tuple[Node, ...]]],
+        spell: Callable[[Tuple[Node, ...]], str],
+    ) -> List[RankedCovering]:
         ranked = [
             RankedCovering(
                 score=self.score_covering(spell(word) for word in covering),
-                covering=covering
+                covering=covering,
             )
             for covering in coverings
         ]
@@ -45,8 +47,10 @@ class CoveringRanker:
 
 def _test() -> None:
     ranker = CoveringRanker()
-    for words in [["corsage", "tuxedo", "dance", "boutonniere"],
-                  ["tussor", "thionine", "egbo", "tunnor"]]:
+    for words in [
+        ["corsage", "tuxedo", "dance", "boutonniere"],
+        ["tussor", "thionine", "egbo", "tunnor"],
+    ]:
         print(words, ranker.score_covering(words))
 
 

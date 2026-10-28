@@ -9,10 +9,7 @@ from strandssolver.readers import reader, htmlreader
 
 
 class HTMLParser(parser.Parser):
-    def __init__(self,
-                 html: str = None,
-                 html_reader: reader.Reader = None
-                 ) -> None:
+    def __init__(self, html: str = None, html_reader: reader.Reader = None) -> None:
         if html_reader is None:
             html_reader = htmlreader.HTMLReader()
         self.html_reader = html_reader
@@ -28,7 +25,7 @@ class HTMLParser(parser.Parser):
     @html.setter
     def html(self, html: str) -> None:
         self._html = html
-        self.soup = bs4.BeautifulSoup(self.html, 'lxml')
+        self.soup = bs4.BeautifulSoup(self.html, "lxml")
 
     @override
     def parse(self) -> gamestate.GameState:
@@ -44,7 +41,7 @@ class HTMLParser(parser.Parser):
         return game_state
 
     def _parse_board(self) -> gamestate.Board:
-        '''
+        """
         <form class="styles-module_wrapper__A7No7" data-testid="strands-board">
            ...
               <button class="styles-module_item__ZXXc7"
@@ -62,7 +59,7 @@ class HTMLParser(parser.Parser):
               </button>
            ...
         </form>
-        '''
+        """
         buttons = self.soup.find_all("button", id=re.compile(r"^button-\d+$"))
 
         letters = []
@@ -96,7 +93,7 @@ class HTMLParser(parser.Parser):
         #   </p>
         #   ...
         # </div>
-        hint = self.soup.find(id='hint')
+        hint = self.soup.find(id="hint")
         paragraph = hint.find("p", recursive=False)
         solved = paragraph.find("b")
         total = solved.find_next_sibling()
@@ -105,6 +102,7 @@ class HTMLParser(parser.Parser):
 
 def _test() -> None:
     from strandssolver.test.stubs.stubhtmlreader import StubHTMLReader
+
     html_parser = HTMLParser(html_reader=StubHTMLReader())
     print(html_parser.parse())
 

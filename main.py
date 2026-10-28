@@ -16,15 +16,19 @@ def read_game() -> gamestate.GameState | None:
         json_reader = jsonreader.JSONReader()
         return jsonparser.JSONParser(json_reader=json_reader).parse()
     except Exception as error:
-        print(f"Could not load the puzzle from the NYT API "
-              f"({describe(error)}), trying the website instead",
-              file=sys.stderr)
+        print(
+            f"Could not load the puzzle from the NYT API "
+            f"({describe(error)}), trying the website instead",
+            file=sys.stderr,
+        )
     try:
         html_reader = htmlreader.HTMLReader()
         return htmlparser.HTMLParser(html_reader=html_reader).parse()
     except Exception as error:
-        print(f"Could not load the puzzle from the website "
-              f"({describe(error)})", file=sys.stderr)
+        print(
+            f"Could not load the puzzle from the website ({describe(error)})",
+            file=sys.stderr,
+        )
     return None
 
 
@@ -40,7 +44,8 @@ def main() -> None:
         sys.exit("Could not load today's puzzle")
     game_graph = graph.CharacterGraphBuilder.build_graph_from_board(game.board)
     trie = dictionarytrie.DictionaryTrieBuilder.load_trie_from_json(
-        filepaths.words_trie_path)
+        filepaths.words_trie_path
+    )
 
     game_solver = solver.Solver(graph=game_graph, game=game, trie=trie)
     ranked_coverings = game_solver.solve()
@@ -54,20 +59,22 @@ def main() -> None:
 
     pos = nx.spring_layout(game_graph)
     nx.draw_networkx_nodes(game_graph, pos=pos)
-    nx.draw_networkx_labels(game_graph,
-                            labels={node: data["character"]
-                                    for node, data in
-                                    game_graph.nodes(data=True)},
-                            pos=pos)
+    nx.draw_networkx_labels(
+        game_graph,
+        labels={node: data["character"] for node, data in game_graph.nodes(data=True)},
+        pos=pos,
+    )
 
     for word in solution:
         edgelist = list(more_itertools.pairwise(word))
-        nx.draw_networkx_edges(game_graph, edgelist=edgelist, pos=pos,
-                               edge_color="b", width=4)
-        nx.draw_networkx_nodes(game_graph, nodelist=[word[0]], pos=pos,
-                               node_color="r", node_size=200)
+        nx.draw_networkx_edges(
+            game_graph, edgelist=edgelist, pos=pos, edge_color="b", width=4
+        )
+        nx.draw_networkx_nodes(
+            game_graph, nodelist=[word[0]], pos=pos, node_color="r", node_size=200
+        )
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -9,8 +9,7 @@ from strandssolver.test.data import filenames
 
 
 class StubDictionary(dictionary.Dictionary):
-    DEFAULT_DICTIONARY_PATH = resources.files(data).joinpath(
-        filenames.words_dictionary)
+    DEFAULT_DICTIONARY_PATH = resources.files(data).joinpath(filenames.words_dictionary)
 
     @override
     def __init__(self, path: str | bytes | os.PathLike = None) -> None:

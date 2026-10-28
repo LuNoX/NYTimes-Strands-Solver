@@ -6,10 +6,9 @@ from strandssolver.readers import reader, jsonreader
 
 
 class JSONParser(parser.Parser):
-    def __init__(self,
-                 puzzle: Dict[str, Any] = None,
-                 json_reader: reader.Reader = None
-                 ) -> None:
+    def __init__(
+        self, puzzle: Dict[str, Any] = None, json_reader: reader.Reader = None
+    ) -> None:
         if json_reader is None:
             json_reader = jsonreader.JSONReader()
         self.json_reader = json_reader
@@ -19,7 +18,7 @@ class JSONParser(parser.Parser):
 
     @override
     def parse(self) -> gamestate.GameState:
-        '''
+        """
         {
             "clue": "theme",
             "startingBoard": ["OSSEDR", ..., "BOONNP"],
@@ -27,11 +26,12 @@ class JSONParser(parser.Parser):
             "spangram": "SPANGRAM",
             ...
         }
-        '''
+        """
         rows = self.puzzle["startingBoard"]
         letters = [letter for row in rows for letter in row]
         characters = gamestate.Board.characters_matrix_from_letters(
-            letters, (len(rows), len(rows[0])))
+            letters, (len(rows), len(rows[0]))
+        )
         return gamestate.GameState(
             board=gamestate.Board(characters),
             theme=self.puzzle["clue"],

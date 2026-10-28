@@ -11,10 +11,11 @@ class JSONReader(reader.Reader):
     DEFAULT_URL_TEMPLATE = "https://www.nytimes.com/svc/strands/v2/{date}.json"
     DEFAULT_TIMEOUT_IN_SECONDS = 10.0
 
-    def __init__(self,
-                 url_template: str = DEFAULT_URL_TEMPLATE,
-                 timeout_in_seconds: float = DEFAULT_TIMEOUT_IN_SECONDS
-                 ) -> None:
+    def __init__(
+        self,
+        url_template: str = DEFAULT_URL_TEMPLATE,
+        timeout_in_seconds: float = DEFAULT_TIMEOUT_IN_SECONDS,
+    ) -> None:
         self.url_template = url_template
         self.timeout_in_seconds = timeout_in_seconds
 
@@ -23,8 +24,7 @@ class JSONReader(reader.Reader):
         if date is None:
             date = datetime.date.today()
         url = self.url_template.format(date=date.isoformat())
-        with urllib.request.urlopen(url,
-                                    timeout=self.timeout_in_seconds) as response:
+        with urllib.request.urlopen(url, timeout=self.timeout_in_seconds) as response:
             return json.load(response)
 
 

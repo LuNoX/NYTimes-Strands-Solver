@@ -6,14 +6,17 @@ from strandssolver.dfs import dfsvisitor, dfsexceptions, dfsdepth
 from strandssolver.dfs.typing import Node, Edge
 
 
-def _dfs_for_child(parent: Node, child: Node,
-                   stack: List[Tuple[Node, Iterable[Node]]],
-                   visited: Set[Node], completed: Set[Node],
-                   depth: dfsdepth.Depth,
-                   get_children: Callable[[Node,
-                                           Optional[...]], Iterable[Node]],
-                   dfs_visitor: dfsvisitor.DFSVisitor,
-                   **kwargs) -> Iterable[Edge]:
+def _dfs_for_child(
+    parent: Node,
+    child: Node,
+    stack: List[Tuple[Node, Iterable[Node]]],
+    visited: Set[Node],
+    completed: Set[Node],
+    depth: dfsdepth.Depth,
+    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    dfs_visitor: dfsvisitor.DFSVisitor,
+    **kwargs,
+) -> Iterable[Edge]:
     edge = (parent, child)
     kwargs["dfs_edge"] = edge
     # Black node?
@@ -33,11 +36,15 @@ def _dfs_for_child(parent: Node, child: Node,
             raise dfsexceptions.GoDeeper()
 
 
-def _finish_node(parent: Node, stack: List[Tuple[Node, Iterable[Node]]],
-                 completed: Set[Node], visited: Set[Node],
-                 depth: dfsdepth.Depth,
-                 dfs_visitor: dfsvisitor.DFSVisitor,
-                 **kwargs) -> None:
+def _finish_node(
+    parent: Node,
+    stack: List[Tuple[Node, Iterable[Node]]],
+    completed: Set[Node],
+    visited: Set[Node],
+    depth: dfsdepth.Depth,
+    dfs_visitor: dfsvisitor.DFSVisitor,
+    **kwargs,
+) -> None:
     completed.add(parent)
     visited.remove(parent)
     stack.pop()
@@ -50,13 +57,15 @@ def _finish_node(parent: Node, stack: List[Tuple[Node, Iterable[Node]]],
         pass
 
 
-def _dfs_while_stack(stack: List[Tuple[Node, Iterable[Node]]],
-                     visited: Set[Node], completed: Set[Node],
-                     depth: dfsdepth.Depth,
-                     get_children: Callable[[Node,
-                                             Optional[...]], Iterable[Node]],
-                     dfs_visitor: dfsvisitor.DFSVisitor,
-                     **kwargs) -> Iterable[Edge]:
+def _dfs_while_stack(
+    stack: List[Tuple[Node, Iterable[Node]]],
+    visited: Set[Node],
+    completed: Set[Node],
+    depth: dfsdepth.Depth,
+    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    dfs_visitor: dfsvisitor.DFSVisitor,
+    **kwargs,
+) -> Iterable[Edge]:
     parent, children = stack[-1]
     kwargs["dfs_parent"] = parent
     kwargs["dfs_children"] = children
@@ -65,36 +74,54 @@ def _dfs_while_stack(stack: List[Tuple[Node, Iterable[Node]]],
             visited.add(parent)
             dfs_visitor.discover_vertex(parent, **kwargs)
         except dfsexceptions.PruneSearch:
-            _finish_node(parent=parent, stack=stack,
-                         completed=completed, visited=visited,
-                         depth=depth,
-                         dfs_visitor=dfs_visitor,
-                         **kwargs)
+            _finish_node(
+                parent=parent,
+                stack=stack,
+                completed=completed,
+                visited=visited,
+                depth=depth,
+                dfs_visitor=dfs_visitor,
+                **kwargs,
+            )
             return
     for child in children:
         try:
-            yield from _dfs_for_child(parent=parent, child=child, stack=stack,
-                                      visited=visited, completed=completed,
-                                      depth=depth,
-                                      get_children=get_children,
-                                      dfs_visitor=dfs_visitor, **kwargs)
+            yield from _dfs_for_child(
+                parent=parent,
+                child=child,
+                stack=stack,
+                visited=visited,
+                completed=completed,
+                depth=depth,
+                get_children=get_children,
+                dfs_visitor=dfs_visitor,
+                **kwargs,
+            )
         except dfsexceptions.PruneSearch:
             continue
         except dfsexceptions.GoDeeper:
             break
     else:
-        _finish_node(parent=parent, stack=stack,
-                     completed=completed, visited=visited,
-                     depth=depth,
-                     dfs_visitor=dfs_visitor, **kwargs)
+        _finish_node(
+            parent=parent,
+            stack=stack,
+            completed=completed,
+            visited=visited,
+            depth=depth,
+            dfs_visitor=dfs_visitor,
+            **kwargs,
+        )
 
 
 def _dfs_edges_for_single_source_node(
-        start: Node, depth_limit: int,
-        visited: Set[Node], completed: Set[Node],
-        get_children: Callable[[Node, Optional[...]], Iterable[Node]],
-        dfs_visitor: dfsvisitor.DFSVisitor,
-        **kwargs) -> Iterable[Edge]:
+    start: Node,
+    depth_limit: int,
+    visited: Set[Node],
+    completed: Set[Node],
+    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    dfs_visitor: dfsvisitor.DFSVisitor,
+    **kwargs,
+) -> Iterable[Edge]:
     if start in visited:
         raise dfsexceptions.NextSourceNode()
     # visited.add(start)
@@ -104,19 +131,26 @@ def _dfs_edges_for_single_source_node(
     kwargs["dfs_stack"] = stack
 
     while stack:
-        yield from _dfs_while_stack(stack=stack,
-                                    visited=visited, completed=completed,
-                                    depth=depth,
-                                    get_children=get_children,
-                                    dfs_visitor=dfs_visitor, **kwargs)
+        yield from _dfs_while_stack(
+            stack=stack,
+            visited=visited,
+            completed=completed,
+            depth=depth,
+            get_children=get_children,
+            dfs_visitor=dfs_visitor,
+            **kwargs,
+        )
 
 
 def dfs_edges(
-        G: nx.Graph, source: Node = None, depth_limit: int = None, *,
-        sort_neighbors: Callable[[Iterable[Node],
-                                  Optional[...]], Iterable[Node]] = None,
-        dfs_visitor: dfsvisitor.DFSVisitor = None,
-        **kwargs) -> Iterable[Edge]:
+    G: nx.Graph,
+    source: Node = None,
+    depth_limit: int = None,
+    *,
+    sort_neighbors: Callable[[Iterable[Node], Optional[...]], Iterable[Node]] = None,
+    dfs_visitor: dfsvisitor.DFSVisitor = None,
+    **kwargs,
+) -> Iterable[Edge]:
     if source is None:
         # edges for all components
         nodes = G
@@ -134,9 +168,8 @@ def dfs_edges(
     kwargs["dfs_sort_neighbors"] = sort_neighbors
     kwargs["dfs_G"] = G
 
-    get_children = (
-        lambda n, **inner_kwargs:
-        iter(sort_neighbors(G.neighbors(n), **inner_kwargs))
+    get_children = lambda n, **inner_kwargs: iter(
+        sort_neighbors(G.neighbors(n), **inner_kwargs)
     )
     kwargs["dfs_get_children"] = get_children
 
@@ -148,10 +181,13 @@ def dfs_edges(
     for start in nodes:
         try:
             yield from _dfs_edges_for_single_source_node(
-                start=start, depth_limit=depth_limit,
-                visited=visited, completed=completed,
+                start=start,
+                depth_limit=depth_limit,
+                visited=visited,
+                completed=completed,
                 get_children=get_children,
-                dfs_visitor=dfs_visitor, **kwargs
+                dfs_visitor=dfs_visitor,
+                **kwargs,
             )
         except dfsexceptions.StopSearch:
             return
@@ -161,6 +197,7 @@ def dfs_edges(
 
 def _test() -> None:
     from strandssolver.test.stubs import stubgraph
+
     g = stubgraph.StubGraphBuilder.build_small_graph()
     depth_limit = 4
     original = nx.dfs_edges(g, depth_limit=depth_limit)

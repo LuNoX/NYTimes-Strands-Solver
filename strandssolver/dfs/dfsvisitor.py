@@ -19,8 +19,7 @@ class DFSVisitor(Protocol):
     def tree_edge(self, edge: Edge, **kwargs) -> None:
         raise NotImplementedError()
 
-    def sort_neighbors(self, neighbors: Iterable[Vertex], **kwargs
-                       ) -> Iterable[Vertex]:
+    def sort_neighbors(self, neighbors: Iterable[Vertex], **kwargs) -> Iterable[Vertex]:
         raise NotImplementedError()
 
 
@@ -65,8 +64,7 @@ class IdleDFSVisitor(DFSVisitor):
         """
         pass
 
-    def sort_neighbors(self, neighbors: Iterable[Vertex], **kwargs
-                       ) -> Iterable[Vertex]:
+    def sort_neighbors(self, neighbors: Iterable[Vertex], **kwargs) -> Iterable[Vertex]:
         """
         When sorting neighbors, return original ordering.
         :param neighbors: neighbors

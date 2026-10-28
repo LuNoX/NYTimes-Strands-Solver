@@ -17,6 +17,7 @@ class BinaryOptimizer:
     x: the (m x 1) binary input vector
     b: the (n x 1) binary target vector
     """
+
     type ProblemType = np.ndarray[tuple[int, int], np.dtype[np.bool_]]
     type InputType = np.ndarray[tuple[int], np.dtype[np.bool_]]
     type TargetType = np.ndarray[tuple[int], np.dtype[np.bool_]]
@@ -24,9 +25,13 @@ class BinaryOptimizer:
 
     DEFAULT_NORM = pulp.lpSum
 
-    def __init__(self, problem: ProblemType = None, target: TargetType = None,
-                 max_input_vector_sum: int = None,
-                 norm: Callable[[ResidualType], float] = None) -> None:
+    def __init__(
+        self,
+        problem: ProblemType = None,
+        target: TargetType = None,
+        max_input_vector_sum: int = None,
+        norm: Callable[[ResidualType], float] = None,
+    ) -> None:
         self._target: BinaryOptimizer.TargetType = None
         self.target = target
         self._problem: BinaryOptimizer.ProblemType = None
@@ -43,8 +48,7 @@ class BinaryOptimizer:
         return self._target
 
     @target.setter
-    def target(self, target: np.typing.ArrayLike | BinaryOptimizer.TargetType
-               ) -> None:
+    def target(self, target: np.typing.ArrayLike | BinaryOptimizer.TargetType) -> None:
         self._target = np.asarray(target, dtype=np.bool_)
 
     @property
@@ -54,9 +58,9 @@ class BinaryOptimizer:
         return self._problem
 
     @problem.setter
-    def problem(self,
-                problem: np.typing.ArrayLike | BinaryOptimizer.ProblemType
-                ) -> None:
+    def problem(
+        self, problem: np.typing.ArrayLike | BinaryOptimizer.ProblemType
+    ) -> None:
         problem = np.asarray(problem, dtype=np.bool_)
         if problem.ndim != 2:
             shape = (self.target.shape[0], -1)
@@ -69,14 +73,15 @@ class BinaryOptimizer:
         n, m = A.shape
 
         optimization = pulp.LpProblem("Binary_Optimization", pulp.LpMinimize)
-        x = [optimization.add_variable(f'x_{i}', cat=pulp.LpBinary)
-             for i in range(m)]
+        x = [optimization.add_variable(f"x_{i}", cat=pulp.LpBinary) for i in range(m)]
         # Define the residual vector r = Ax - b
-        residuals = [pulp.lpSum(x[j] for j in range(m) if A[i, j]) - int(b[i])
-                     for i in range(n)]
+        residuals = [
+            pulp.lpSum(x[j] for j in range(m) if A[i, j]) - int(b[i]) for i in range(n)
+        ]
 
-        residuals_abs = [optimization.add_variable(f'r_abs_{i}', lowBound=0)
-                         for i in range(n)]
+        residuals_abs = [
+            optimization.add_variable(f"r_abs_{i}", lowBound=0) for i in range(n)
+        ]
 
         for i in range(n):
             optimization += residuals_abs[i] >= residuals[i]
@@ -93,9 +98,9 @@ class BinaryOptimizer:
         return np.array(x, dtype=np.bool_)
 
 
-def convert_words_to_problem_matrix(words: Iterable[Tuple[Tuple[int, ...]]],
-                                    graph: nx.Graph
-                                    ) -> BinaryOptimizer.ProblemType:
+def convert_words_to_problem_matrix(
+    words: Iterable[Tuple[Tuple[int, ...]]], graph: nx.Graph
+) -> BinaryOptimizer.ProblemType:
     nodes = list(graph.nodes)
     index_per_node = {node: index for index, node in enumerate(nodes)}
     problem = []
@@ -108,17 +113,15 @@ def convert_words_to_problem_matrix(words: Iterable[Tuple[Tuple[int, ...]]],
     return problem
 
 
-def convert_problem_solution_to_words(solution: BinaryOptimizer.InputType,
-                                      words: Iterable[Tuple[Tuple[int, ...]]]
-                                      ) -> Iterable[Tuple[Tuple[int, ...]]]:
+def convert_problem_solution_to_words(
+    solution: BinaryOptimizer.InputType, words: Iterable[Tuple[Tuple[int, ...]]]
+) -> Iterable[Tuple[Tuple[int, ...]]]:
     return [word for include, word in zip(solution, words) if include]
 
 
 def _test() -> None:
     # Example usage
-    A = [[1, 0, 1],
-         [0, 0, 1],
-         [1, 1, 0]]
+    A = [[1, 0, 1], [0, 0, 1], [1, 1, 0]]
 
     b = [1, 1, 1]
 

@@ -16,19 +16,20 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
 
     @staticmethod
     @override
-    def build_trie_from_dictionary(dictionary: Dictionary = None
-                                   ) -> pygtrie.CharTrie:
+    def build_trie_from_dictionary(dictionary: Dictionary = None) -> pygtrie.CharTrie:
         if dictionary is None:
             dictionary = stubdictionary.StubDictionary()
-        return super(StubDictionaryTrieBuilder, StubDictionaryTrieBuilder
-                     ).build_trie_from_dictionary(dictionary)
+        return super(
+            StubDictionaryTrieBuilder, StubDictionaryTrieBuilder
+        ).build_trie_from_dictionary(dictionary)
 
     @staticmethod
     @override
-    def load_trie_from_json(path: str | bytes | os.PathLike = None,
-                            encoding: str = None,
-                            cast_to: Type[pygtrie.Trie] = pygtrie.CharTrie
-                            ) -> pygtrie.Trie:
+    def load_trie_from_json(
+        path: str | bytes | os.PathLike = None,
+        encoding: str = None,
+        cast_to: Type[pygtrie.Trie] = pygtrie.CharTrie,
+    ) -> pygtrie.Trie:
         if path is None:
             path = StubDictionaryTrieBuilder.DEFAULT_TRIE_PATH
         return super(
@@ -37,12 +38,13 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
 
     @staticmethod
     @override
-    def store_trie_as_json(trie: pygtrie.Trie = None,
-                           path: str | bytes | os.PathLike = None,
-                           encoding: str = None,
-                           ensure_ascii: bool = None,
-                           indent: int = None
-                           ) -> None:
+    def store_trie_as_json(
+        trie: pygtrie.Trie = None,
+        path: str | bytes | os.PathLike = None,
+        encoding: str = None,
+        ensure_ascii: bool = None,
+        indent: int = None,
+    ) -> None:
         """
         Stub method
         """
@@ -53,7 +55,7 @@ def _test() -> None:
     trie = StubDictionaryTrieBuilder.build_trie_from_dictionary()
     trie_json = StubDictionaryTrieBuilder.load_trie_from_json()
     print(trie_json == trie)
-    trie_json['blubbasbbsjhsjuhjksh'] = True
+    trie_json["blubbasbbsjhsjuhjksh"] = True
     print(trie_json == trie)
 
 

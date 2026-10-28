@@ -7,10 +7,11 @@ from typing import Tuple, List
 class Board:
     DEFAULT_SHAPE = (8, 6)
 
-    def __init__(self,
-                 characters: np.typing.NDArray[np.str_],
-                 solved_states: np.typing.NDArray[np.bool_] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        characters: np.typing.NDArray[np.str_],
+        solved_states: np.typing.NDArray[np.bool_] = None,
+    ) -> None:
         self.characters = characters
         if solved_states is None:
             solved_states = self._default_solved_states()
@@ -24,9 +25,9 @@ class Board:
         return np.zeros(self.shape, dtype=bool)
 
     @classmethod
-    def characters_matrix_from_letters(cls, letters: List[str],
-                                       shape: Tuple[int, ...] = DEFAULT_SHAPE
-                                       ) -> np.typing.NDArray[np.str_]:
+    def characters_matrix_from_letters(
+        cls, letters: List[str], shape: Tuple[int, ...] = DEFAULT_SHAPE
+    ) -> np.typing.NDArray[np.str_]:
         array = np.array(letters)
         characters = array.reshape(shape)
         return characters

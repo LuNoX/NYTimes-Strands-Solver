@@ -7,15 +7,13 @@ from strandssolver.models import graph, gamestate
 
 
 class StubGraphBuilder(graph.CharacterGraphBuilder):
-
     @staticmethod
     @override
     def build_graph_from_board(board: gamestate.Board = None) -> nx.Graph:
         if board is None:
             game = stubgamestate.StubGameState()
             board = game.board
-        return super(StubGraphBuilder, StubGraphBuilder
-                     ).build_graph_from_board(board)
+        return super(StubGraphBuilder, StubGraphBuilder).build_graph_from_board(board)
 
     @staticmethod
     def build_small_graph() -> nx.Graph:

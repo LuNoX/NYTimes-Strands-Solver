@@ -6,8 +6,12 @@ from strandssolver.dfs.typing import Node
 
 
 class ExactCoverEnumerator:
-    def __init__(self, words: Iterable[Tuple[Node, ...]], graph: nx.Graph,
-                 max_number_of_words: int = None) -> None:
+    def __init__(
+        self,
+        words: Iterable[Tuple[Node, ...]],
+        graph: nx.Graph,
+        max_number_of_words: int = None,
+    ) -> None:
         self.words = list(words)
         if max_number_of_words is None:
             max_number_of_words = len(graph)
@@ -17,8 +21,7 @@ class ExactCoverEnumerator:
         nodes = sorted(graph.nodes)
         bit_per_node = {node: 1 << index for index, node in enumerate(nodes)}
         self.all_nodes_mask = (1 << len(nodes)) - 1
-        self.masks = [sum(bit_per_node[node] for node in word)
-                      for word in self.words]
+        self.masks = [sum(bit_per_node[node] for node in word) for word in self.words]
         self.longest_word_length = max(map(len, self.words), default=0)
 
         # The search always covers the lowest uncovered node next
@@ -39,8 +42,10 @@ class ExactCoverEnumerator:
             return
         uncovered = self.all_nodes_mask & ~covered
         max_coverable = words_left * self.longest_word_length
-        if (uncovered.bit_count() > max_coverable
-                or self._dead_ends.get(covered, -1) >= words_left):
+        if (
+            uncovered.bit_count() > max_coverable
+            or self._dead_ends.get(covered, -1) >= words_left
+        ):
             return
 
         found_covering = False
@@ -62,9 +67,13 @@ def _lowest_bit_index(mask: int) -> int:
 
 def _test() -> None:
     graph = nx.grid_2d_graph(2, 2)
-    words = [((0, 0), (0, 1)), ((1, 0), (1, 1)),
-             ((0, 0), (1, 0)), ((0, 1), (1, 1)),
-             ((0, 0), (0, 1), (1, 1))]
+    words = [
+        ((0, 0), (0, 1)),
+        ((1, 0), (1, 1)),
+        ((0, 0), (1, 0)),
+        ((0, 1), (1, 1)),
+        ((0, 0), (0, 1), (1, 1)),
+    ]
     enumerator = ExactCoverEnumerator(words, graph, max_number_of_words=2)
     for covering in enumerator.enumerate():
         print(covering)
