@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 import pygtrie
 import collections
+import more_itertools
 
 from dataclasses import dataclass
 from typing import List, Tuple, Set, Iterable
@@ -45,7 +46,7 @@ class Solver:
             edges = depthfirstsearch.dfs_edges(self.graph, source=node,
                                                dfs_visitor=visitor)
             # Exhaust the iterator so the visitor builds all words
-            collections.deque(edges, maxlen=0)
+            more_itertools.consume(edges)
             for word, string in visitor.words.items():
                 words.setdefault((frozenset(word), string), word)
 

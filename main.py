@@ -1,4 +1,5 @@
 import networkx as nx
+import more_itertools
 import sys
 
 from matplotlib import pyplot as plt
@@ -60,7 +61,7 @@ def main() -> None:
                             pos=pos)
 
     for word in solution:
-        edgelist = [(word[i], word[i + 1]) for i in range(len(word) - 1)]
+        edgelist = list(more_itertools.pairwise(word))
         nx.draw_networkx_edges(game_graph, edgelist=edgelist, pos=pos,
                                edge_color="b", width=4)
         nx.draw_networkx_nodes(game_graph, nodelist=[word[0]], pos=pos,
