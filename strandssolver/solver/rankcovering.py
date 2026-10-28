@@ -21,6 +21,11 @@ class CoveringRanker:
             language = CoveringRanker.DEFAULT_LANGUAGE
         self.language = language
 
+    @property
+    def max_score(self) -> float:
+        most_common_word = wordfreq.top_n_list(self.language, 1)[0]
+        return self.score_word(most_common_word)
+
     def score_word(self, word: str) -> float:
         return wordfreq.zipf_frequency(word.lower(), self.language)
 

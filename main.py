@@ -6,7 +6,7 @@ from typing import Optional
 
 from matplotlib import pyplot as plt
 
-from strandssolver.solver import solver
+from strandssolver.solver import rankcovering, solver
 from strandssolver.readers import htmlreader, jsonreader
 from strandssolver.parsers import htmlparser, jsonparser
 from strandssolver.models import gamestate, graph, dictionarytrie
@@ -52,19 +52,26 @@ def main() -> None:
     game_solver = solver.Solver(graph=game_graph, game=game, trie=trie)
     ranked_coverings = game_solver.solve()
     if not ranked_coverings:
-        print("No covering found")
+        print("Could not find a solution! You'll have to try this one yourself :(")
         return
+    print(f"Todays's puzzle: {game.theme}")
+    print("Found the following solution(s):")
+    max_score = rankcovering.CoveringRanker().max_score
     for ranked_covering in ranked_coverings:
         words = [game_solver.spell(word) for word in ranked_covering.covering]
-        print(f"{ranked_covering.score:.2f}: {', '.join(words)}")
+        print(
+            f"{', '.join(words)} with confidence {ranked_covering.score / max_score:.2f}/1.00"
+        )
     solution = ranked_coverings[0].covering
 
+    plt.figure("StrandsSolver")
     pos = {(row, column): (column, -row) for row, column in game_graph.nodes}
     nx.draw_networkx_nodes(game_graph, pos=pos)
     nx.draw_networkx_labels(
         game_graph,
         labels={node: data["character"] for node, data in game_graph.nodes(data=True)},
         pos=pos,
+        verticalalignment="center_baseline",
     )
 
     for word in solution:
@@ -77,6 +84,7 @@ def main() -> None:
         )
     plt.gca().set_aspect("equal")
     plt.axis("off")
+    plt.title(f"{game.theme}")
     plt.show()
 
 
