@@ -18,12 +18,14 @@ def main() -> None:
         filepaths.words_trie_path)
 
     game_solver = solver.Solver(graph=game_graph, game=game, trie=trie)
-    solution = game_solver.solve()
-    for word in solution:
-        string = ""
-        for node in word:
-            string += game_graph.nodes[node]["character"]
-        print(string)
+    ranked_coverings = game_solver.solve()
+    if not ranked_coverings:
+        print("No covering found")
+        return
+    for ranked_covering in ranked_coverings:
+        words = [game_solver.spell(word) for word in ranked_covering.covering]
+        print(f"{ranked_covering.score:.2f}: {', '.join(words)}")
+    solution = ranked_coverings[0].covering
 
     pos = nx.spring_layout(game_graph)
     nx.draw_networkx_nodes(game_graph, pos=pos)
