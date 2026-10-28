@@ -1,11 +1,10 @@
-from importlib import resources
+import pathlib
 
-from strandssolver.test import data
 from strandssolver.test.data import filenames
 
-strands_html_path = resources.files(data).joinpath(filenames.strands_html)
-strands_html_partial_solve_path = resources.files(data).joinpath(
-    filenames.strands_html_partial_solve
-)
-words_dictionary_path = resources.files(data).joinpath(filenames.words_dictionary)
-words_trie_path = resources.files(data).joinpath(filenames.words_trie)
+data_directory = pathlib.Path(__file__).parent
+
+strands_html_path = data_directory / filenames.strands_html
+strands_html_partial_solve_path = data_directory / filenames.strands_html_partial_solve
+words_dictionary_path = data_directory / filenames.words_dictionary
+words_trie_path = data_directory / filenames.words_trie

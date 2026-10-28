@@ -1,22 +1,22 @@
 import os
 import pygtrie
 
-from typing import Type, override
-from importlib import resources
+from typing import Type, override, Optional
 
 from strandssolver.models import dictionarytrie
 from strandssolver.models.dictionary import Dictionary
-from strandssolver.test import data
-from strandssolver.test.data import filenames
+from strandssolver.test.data import filepaths
 from strandssolver.test.stubs import stubdictionary
 
 
 class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
-    DEFAULT_TRIE_PATH = resources.files(data).joinpath(filenames.words_trie)
+    DEFAULT_TRIE_PATH = filepaths.words_trie_path
 
     @staticmethod
     @override
-    def build_trie_from_dictionary(dictionary: Dictionary = None) -> pygtrie.CharTrie:
+    def build_trie_from_dictionary(
+        dictionary: Optional[Dictionary] = None,
+    ) -> pygtrie.CharTrie:
         if dictionary is None:
             dictionary = stubdictionary.StubDictionary()
         return super(
@@ -26,8 +26,8 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
     @staticmethod
     @override
     def load_trie_from_json(
-        path: str | bytes | os.PathLike = None,
-        encoding: str = None,
+        path: Optional[str | bytes | os.PathLike] = None,
+        encoding: Optional[str] = None,
         cast_to: Type[pygtrie.Trie] = pygtrie.CharTrie,
     ) -> pygtrie.Trie:
         if path is None:
@@ -39,11 +39,11 @@ class StubDictionaryTrieBuilder(dictionarytrie.DictionaryTrieBuilder):
     @staticmethod
     @override
     def store_trie_as_json(
-        trie: pygtrie.Trie = None,
-        path: str | bytes | os.PathLike = None,
-        encoding: str = None,
-        ensure_ascii: bool = None,
-        indent: int = None,
+        trie: Optional[pygtrie.Trie] = None,
+        path: Optional[str | bytes | os.PathLike] = None,
+        encoding: Optional[str] = None,
+        ensure_ascii: Optional[bool] = None,
+        indent: Optional[int] = None,
     ) -> None:
         """
         Stub method

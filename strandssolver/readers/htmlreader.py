@@ -1,6 +1,6 @@
 import asyncio
 
-from typing import override, List
+from typing import override, List, Optional
 import datetime
 from selenium import webdriver
 from selenium.common.exceptions import (
@@ -28,16 +28,16 @@ class HTMLReader(reader.Reader):
 
     def __init__(
         self,
-        url: str | bytes = DEFAULT_URL,
+        url: str = DEFAULT_URL,
         max_attempts: int = DEFAULT_MAX_ATTEMPTS,
-        webdriver_arguments: List[str] = None,
+        webdriver_arguments: Optional[List[str]] = None,
         seconds_between_attempts: float
         | datetime.timedelta = DEFAULT_TIME_BETWEEN_ATTEMPTS,
         load_complete_when_html_contains_this: str = DEFAULT_LOAD_COMPLETE_WHEN_HTML_CONTAINS_THIS,
     ) -> None:
         self.url = url
         self.max_attempts = max_attempts
-        self._seconds_between_attempts = None
+        self._seconds_between_attempts: float
         self.seconds_between_attempts = seconds_between_attempts
         self.load_complete_when_html_contains_this = (
             load_complete_when_html_contains_this
@@ -65,7 +65,7 @@ class HTMLReader(reader.Reader):
         self._seconds_between_attempts = seconds
 
     @override
-    def read(self, url: str | bytes = None) -> str:
+    def read(self, url: Optional[str] = None, /) -> str:
         if url is None:
             url = self.url
         self.webdriver.get(url)

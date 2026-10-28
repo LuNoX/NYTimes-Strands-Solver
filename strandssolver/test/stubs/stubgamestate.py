@@ -1,6 +1,6 @@
 import numpy as np
 
-from typing import override
+from typing import override, Optional
 
 from strandssolver.models import gamestate
 from strandssolver.test.stubs import stubhtmlparser
@@ -10,10 +10,10 @@ class StubGameState(gamestate.GameState):
     @override
     def __init__(
         self,
-        board: gamestate.Board = None,
-        theme: str = None,
-        number_of_total_words: int = None,
-        number_of_solved_words: int = None,
+        board: Optional[gamestate.Board] = None,
+        theme: Optional[str] = None,
+        number_of_total_words: Optional[int] = None,
+        number_of_solved_words: Optional[int] = None,
     ) -> None:
         game = stubhtmlparser.StubHTMLParser().parse()
         if board is None:

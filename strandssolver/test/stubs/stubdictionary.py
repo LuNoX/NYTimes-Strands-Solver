@@ -1,18 +1,15 @@
 import os
 
-from importlib import resources
-from typing import override
+from typing import Optional
 
 from strandssolver.models import dictionary
-from strandssolver.test import data
-from strandssolver.test.data import filenames
+from strandssolver.test.data import filepaths
 
 
 class StubDictionary(dictionary.Dictionary):
-    DEFAULT_DICTIONARY_PATH = resources.files(data).joinpath(filenames.words_dictionary)
+    DEFAULT_DICTIONARY_PATH = filepaths.words_dictionary_path
 
-    @override
-    def __init__(self, path: str | bytes | os.PathLike = None) -> None:
+    def __init__(self, path: Optional[str | bytes | os.PathLike] = None) -> None:
         self.filter_condition = lambda word: len(word) >= 1
         if path is None:
             path = StubDictionary.DEFAULT_DICTIONARY_PATH

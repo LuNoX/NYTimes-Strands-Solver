@@ -1,9 +1,9 @@
 import networkx as nx
 
-from typing import Callable, Iterable, Set, Optional, List, Tuple
+from typing import Iterable, Iterator, Set, List, Tuple, Optional
 
 from strandssolver.dfs import dfsvisitor, dfsexceptions, dfsdepth
-from strandssolver.dfs.typing import Node, Edge
+from strandssolver.dfs.typing import Node, Edge, GetChildren, SortNeighbors
 
 
 def _dfs_for_child(
@@ -13,7 +13,7 @@ def _dfs_for_child(
     visited: Set[Node],
     completed: Set[Node],
     depth: dfsdepth.Depth,
-    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    get_children: GetChildren,
     dfs_visitor: dfsvisitor.DFSVisitor,
     **kwargs,
 ) -> Iterable[Edge]:
@@ -62,7 +62,7 @@ def _dfs_while_stack(
     visited: Set[Node],
     completed: Set[Node],
     depth: dfsdepth.Depth,
-    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    get_children: GetChildren,
     dfs_visitor: dfsvisitor.DFSVisitor,
     **kwargs,
 ) -> Iterable[Edge]:
@@ -118,7 +118,7 @@ def _dfs_edges_for_single_source_node(
     depth_limit: int,
     visited: Set[Node],
     completed: Set[Node],
-    get_children: Callable[[Node, Optional[...]], Iterable[Node]],
+    get_children: GetChildren,
     dfs_visitor: dfsvisitor.DFSVisitor,
     **kwargs,
 ) -> Iterable[Edge]:
@@ -145,10 +145,10 @@ def _dfs_edges_for_single_source_node(
 def dfs_edges(
     G: nx.Graph,
     source: Node = None,
-    depth_limit: int = None,
+    depth_limit: Optional[int] = None,
     *,
-    sort_neighbors: Callable[[Iterable[Node], Optional[...]], Iterable[Node]] = None,
-    dfs_visitor: dfsvisitor.DFSVisitor = None,
+    sort_neighbors: Optional[SortNeighbors] = None,
+    dfs_visitor: Optional[dfsvisitor.DFSVisitor] = None,
     **kwargs,
 ) -> Iterable[Edge]:
     if source is None:
@@ -168,9 +168,9 @@ def dfs_edges(
     kwargs["dfs_sort_neighbors"] = sort_neighbors
     kwargs["dfs_G"] = G
 
-    get_children = lambda n, **inner_kwargs: iter(
-        sort_neighbors(G.neighbors(n), **inner_kwargs)
-    )
+    def get_children(n: Node, **inner_kwargs) -> Iterator[Node]:
+        return iter(sort_neighbors(G.neighbors(n), **inner_kwargs))
+
     kwargs["dfs_get_children"] = get_children
 
     # White := nodes that are neither in visited nor in completed

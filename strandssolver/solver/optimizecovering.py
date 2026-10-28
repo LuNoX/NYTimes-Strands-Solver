@@ -5,7 +5,7 @@ import numpy.typing
 import pulp
 import networkx as nx
 
-from typing import Callable, Iterable, Tuple
+from typing import Callable, Iterable, List, Tuple, Optional
 
 
 class BinaryOptimizer:
@@ -27,14 +27,16 @@ class BinaryOptimizer:
 
     def __init__(
         self,
-        problem: ProblemType = None,
-        target: TargetType = None,
-        max_input_vector_sum: int = None,
-        norm: Callable[[ResidualType], float] = None,
+        problem: Optional[np.typing.ArrayLike] = None,
+        target: Optional[np.typing.ArrayLike] = None,
+        max_input_vector_sum: Optional[int] = None,
+        norm: Optional[
+            Callable[[List[pulp.LpVariable]], pulp.LpAffineExpression]
+        ] = None,
     ) -> None:
-        self._target: BinaryOptimizer.TargetType = None
+        self._target: Optional[BinaryOptimizer.TargetType] = None
         self.target = target
-        self._problem: BinaryOptimizer.ProblemType = None
+        self._problem: Optional[BinaryOptimizer.ProblemType] = None
         self.problem = problem
         if norm is None:
             norm = BinaryOptimizer.DEFAULT_NORM
@@ -48,8 +50,10 @@ class BinaryOptimizer:
         return self._target
 
     @target.setter
-    def target(self, target: np.typing.ArrayLike | BinaryOptimizer.TargetType) -> None:
-        self._target = np.asarray(target, dtype=np.bool_)
+    def target(
+        self, target: Optional[np.typing.ArrayLike | BinaryOptimizer.TargetType]
+    ) -> None:
+        self._target = None if target is None else np.asarray(target, dtype=np.bool_)
 
     @property
     def problem(self) -> BinaryOptimizer.ProblemType:
@@ -59,8 +63,11 @@ class BinaryOptimizer:
 
     @problem.setter
     def problem(
-        self, problem: np.typing.ArrayLike | BinaryOptimizer.ProblemType
+        self, problem: Optional[np.typing.ArrayLike | BinaryOptimizer.ProblemType]
     ) -> None:
+        if problem is None:
+            self._problem = None
+            return
         problem = np.asarray(problem, dtype=np.bool_)
         if problem.ndim != 2:
             shape = (self.target.shape[0], -1)
@@ -99,7 +106,7 @@ class BinaryOptimizer:
 
 
 def convert_words_to_problem_matrix(
-    words: Iterable[Tuple[Tuple[int, ...]]], graph: nx.Graph
+    words: Iterable[Tuple[Tuple[int, ...], ...]], graph: nx.Graph
 ) -> BinaryOptimizer.ProblemType:
     nodes = list(graph.nodes)
     index_per_node = {node: index for index, node in enumerate(nodes)}
@@ -114,8 +121,8 @@ def convert_words_to_problem_matrix(
 
 
 def convert_problem_solution_to_words(
-    solution: BinaryOptimizer.InputType, words: Iterable[Tuple[Tuple[int, ...]]]
-) -> Iterable[Tuple[Tuple[int, ...]]]:
+    solution: BinaryOptimizer.InputType, words: Iterable[Tuple[Tuple[int, ...], ...]]
+) -> Iterable[Tuple[Tuple[int, ...], ...]]:
     return [word for include, word in zip(solution, words) if include]
 
 

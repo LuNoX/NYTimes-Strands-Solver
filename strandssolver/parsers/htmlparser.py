@@ -1,7 +1,7 @@
 import bs4
 import re
 
-from typing import Tuple, override
+from typing import Tuple, override, Optional
 
 from strandssolver.models import gamestate
 from strandssolver.parsers import parser
@@ -9,13 +9,15 @@ from strandssolver.readers import reader, htmlreader
 
 
 class HTMLParser(parser.Parser):
-    def __init__(self, html: str = None, html_reader: reader.Reader = None) -> None:
+    def __init__(
+        self, html: Optional[str] = None, html_reader: Optional[reader.Reader] = None
+    ) -> None:
         if html_reader is None:
             html_reader = htmlreader.HTMLReader()
         self.html_reader = html_reader
         if html is None:
             html = self.html_reader.read()
-        self._html = None
+        self._html: str
         self.html = html
 
     @property
@@ -64,7 +66,7 @@ class HTMLParser(parser.Parser):
 
         letters = []
         for button in buttons:
-            index = int(button.attrs["id"].strip("button-"))
+            index = int(str(button["id"]).strip("button-"))
             letter = button.text
             letters.append((index, letter))
         letters = sorted(letters, key=lambda tup: tup[0])
@@ -83,6 +85,8 @@ class HTMLParser(parser.Parser):
         #   </h2>
         # </section>
         theme = self.soup.select_one('#riddle [class*="clue"]')
+        if theme is None:
+            raise ValueError("Could not find the theme on the page")
         return theme.text
 
     def _parse_word_counts(self) -> Tuple[int, int]:
@@ -93,10 +97,7 @@ class HTMLParser(parser.Parser):
         #   </p>
         #   ...
         # </div>
-        hint = self.soup.find(id="hint")
-        paragraph = hint.find("p", recursive=False)
-        solved = paragraph.find("b")
-        total = solved.find_next_sibling()
+        solved, total = self.soup.select("#hint > p > b")[:2]
         return int(solved.text), int(total.text)
 
 

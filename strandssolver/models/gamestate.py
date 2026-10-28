@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 import numpy.typing
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 
 class Board:
@@ -10,7 +10,7 @@ class Board:
     def __init__(
         self,
         characters: np.typing.NDArray[np.str_],
-        solved_states: np.typing.NDArray[np.bool_] = None,
+        solved_states: Optional[np.typing.NDArray[np.bool_]] = None,
     ) -> None:
         self.characters = characters
         if solved_states is None:

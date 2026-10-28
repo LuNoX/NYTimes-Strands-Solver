@@ -9,7 +9,6 @@ from strandssolver.dfs.typing import Vertex, Edge
 
 
 class StrandsDFSVisitor(dfsvisitor.IdleDFSVisitor):
-    @override
     def __init__(self, graph: nx.Graph, trie: pygtrie.Trie) -> None:
         self.graph = graph
         self.trie = trie

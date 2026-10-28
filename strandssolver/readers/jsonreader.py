@@ -2,7 +2,7 @@ import datetime
 import json
 import urllib.request
 
-from typing import Any, Dict, override
+from typing import Any, Dict, override, Optional
 
 from strandssolver.readers import reader
 
@@ -20,7 +20,7 @@ class JSONReader(reader.Reader):
         self.timeout_in_seconds = timeout_in_seconds
 
     @override
-    def read(self, date: datetime.date = None) -> Dict[str, Any]:
+    def read(self, date: Optional[datetime.date] = None, /) -> Dict[str, Any]:
         if date is None:
             date = datetime.date.today()
         url = self.url_template.format(date=date.isoformat())

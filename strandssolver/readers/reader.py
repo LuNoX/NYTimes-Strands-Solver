@@ -2,5 +2,5 @@ from typing import Protocol, Any
 
 
 class Reader(Protocol):
-    def read(self, source: Any) -> Any:
+    def read(self, source: Any = None, /) -> Any:
         raise NotImplementedError()

@@ -2,6 +2,8 @@ import networkx as nx
 import more_itertools
 import sys
 
+from typing import Optional
+
 from matplotlib import pyplot as plt
 
 from strandssolver.solver import solver
@@ -11,7 +13,7 @@ from strandssolver.models import gamestate, graph, dictionarytrie
 from strandssolver.test.data import filepaths
 
 
-def read_game() -> gamestate.GameState | None:
+def read_game() -> Optional[gamestate.GameState]:
     try:
         json_reader = jsonreader.JSONReader()
         return jsonparser.JSONParser(json_reader=json_reader).parse()

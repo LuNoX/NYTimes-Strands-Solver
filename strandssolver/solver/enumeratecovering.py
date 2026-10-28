@@ -1,6 +1,6 @@
 import networkx as nx
 
-from typing import Dict, Iterable, Iterator, List, Tuple
+from typing import Dict, Iterable, Iterator, List, Tuple, Optional
 
 from strandssolver.dfs.typing import Node
 
@@ -10,7 +10,7 @@ class ExactCoverEnumerator:
         self,
         words: Iterable[Tuple[Node, ...]],
         graph: nx.Graph,
-        max_number_of_words: int = None,
+        max_number_of_words: Optional[int] = None,
     ) -> None:
         self.words = list(words)
         if max_number_of_words is None:

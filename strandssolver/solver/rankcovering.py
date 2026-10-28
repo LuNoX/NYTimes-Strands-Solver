@@ -2,7 +2,7 @@ import statistics
 import wordfreq
 
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, List, Tuple
+from typing import Callable, Iterable, List, Tuple, Optional
 
 from strandssolver.dfs.typing import Node
 
@@ -16,7 +16,7 @@ class RankedCovering:
 class CoveringRanker:
     DEFAULT_LANGUAGE = "en"
 
-    def __init__(self, language: str = None) -> None:
+    def __init__(self, language: Optional[str] = None) -> None:
         if language is None:
             language = CoveringRanker.DEFAULT_LANGUAGE
         self.language = language

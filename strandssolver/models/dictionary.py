@@ -1,7 +1,7 @@
 import os
 import json
 
-from typing import Iterable, Callable, Set
+from typing import Iterable, Iterator, Callable, Set, Optional
 from dataclasses import dataclass
 
 
@@ -10,11 +10,11 @@ class Dictionary:
     words: Iterable[str]
     filter_condition: Callable[[str], bool] = lambda word: True
 
-    def __iter__(self) -> Iterable[str]:
+    def __iter__(self) -> Iterator[str]:
         return (word for word in self.words if self.filter_condition(word))
 
     def drop_filtered_words(
-        self, filter_condition: Callable[[str], bool] = None
+        self, filter_condition: Optional[Callable[[str], bool]] = None
     ) -> None:
         if filter_condition is None:
             filter_condition = self.filter_condition
@@ -31,19 +31,19 @@ class DictionaryBuilder:
 
     @staticmethod
     def build_dictionary_from_json(
-        path: str | bytes | os.PathLike, filter_condition: Callable[[str], bool] = None
+        path: str | bytes | os.PathLike,
+        filter_condition: Optional[Callable[[str], bool]] = None,
     ) -> Dictionary:
         words = DictionaryBuilder.load_keys_from_json(path)
-        dictionary = Dictionary(words, filter_condition)
-        return dictionary
+        if filter_condition is None:
+            return Dictionary(words)
+        return Dictionary(words, filter_condition)
 
 
 def _test() -> None:
-    from importlib import resources
-    from strandssolver.test import data
-    from strandssolver.test.data import filenames
+    from strandssolver.test.data import filepaths
 
-    word_dict_json = resources.files(data).joinpath(filenames.words_dictionary)
+    word_dict_json = filepaths.words_dictionary_path
     dictionary = DictionaryBuilder.build_dictionary_from_json(
         word_dict_json, lambda word: len(word) >= 20
     )

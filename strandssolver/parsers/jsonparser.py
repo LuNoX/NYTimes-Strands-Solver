@@ -1,4 +1,4 @@
-from typing import Any, Dict, override
+from typing import Any, Dict, override, Optional
 
 from strandssolver.models import gamestate
 from strandssolver.parsers import parser
@@ -7,7 +7,9 @@ from strandssolver.readers import reader, jsonreader
 
 class JSONParser(parser.Parser):
     def __init__(
-        self, puzzle: Dict[str, Any] = None, json_reader: reader.Reader = None
+        self,
+        puzzle: Optional[Dict[str, Any]] = None,
+        json_reader: Optional[reader.Reader] = None,
     ) -> None:
         if json_reader is None:
             json_reader = jsonreader.JSONReader()

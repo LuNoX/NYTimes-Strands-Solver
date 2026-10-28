@@ -1,6 +1,6 @@
 import networkx as nx
 
-from typing import override
+from typing import override, Optional
 
 from strandssolver.test.stubs import stubgamestate
 from strandssolver.models import graph, gamestate
@@ -9,7 +9,7 @@ from strandssolver.models import graph, gamestate
 class StubGraphBuilder(graph.CharacterGraphBuilder):
     @staticmethod
     @override
-    def build_graph_from_board(board: gamestate.Board = None) -> nx.Graph:
+    def build_graph_from_board(board: Optional[gamestate.Board] = None) -> nx.Graph:
         if board is None:
             game = stubgamestate.StubGameState()
             board = game.board

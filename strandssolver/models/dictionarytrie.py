@@ -2,7 +2,7 @@ import pygtrie
 import os
 import json
 
-from typing import Type
+from typing import Type, Optional
 
 from strandssolver.models.dictionary import Dictionary
 
@@ -23,9 +23,9 @@ class DictionaryTrieBuilder:
     def store_trie_as_json(
         trie: pygtrie.Trie,
         path: str | bytes | os.PathLike,
-        encoding: str = None,
-        ensure_ascii: bool = None,
-        indent: int = None,
+        encoding: Optional[str] = None,
+        ensure_ascii: Optional[bool] = None,
+        indent: Optional[int] = None,
     ) -> None:
         if encoding is None:
             encoding = DictionaryTrieBuilder.DEFAULT_JSON_ENCODING
@@ -40,9 +40,11 @@ class DictionaryTrieBuilder:
     @staticmethod
     def load_trie_from_json(
         path: str | bytes | os.PathLike,
-        encoding: str = DEFAULT_JSON_ENCODING,
+        encoding: Optional[str] = None,
         cast_to: Type[pygtrie.Trie] = pygtrie.Trie,
     ) -> pygtrie.Trie:
+        if encoding is None:
+            encoding = DictionaryTrieBuilder.DEFAULT_JSON_ENCODING
         with open(path, "r", encoding=encoding) as f:
             trie_dict = json.load(f)
             return cast_to(trie_dict)
