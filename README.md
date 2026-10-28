@@ -67,30 +67,30 @@ For the example puzzle, the search finds 1,532 word paths, made up of 1,071 diff
 
 Number the board's 48 cells, each becomes a dimension in the embedding space. Then each word is embedded as a 48-dimensional vector with one value per cell: 1 if the
 word uses that cell, 0 if it doesn't. Placing these for example 1,532 vectors side by side as columns gives a
-matrix $\mathbf{A}$, which encapsulates the entire puzzle as a linear algebra problem.
+matrix $𝐀,$ which encapsulates the entire puzzle as a linear algebra problem.
 
 A candidate solution is then a vector $\vec{x}$ with one entry per word: 1 if the word is chosen, 0
-if not. The product $`\mathbf{A}\vec{x}`$ thus counts, for every letter, how many of the chosen words use it.
-Strands needs every letter used exactly once, so the target is the all-ones vector $`\vec{b}`$, and
+if not. The product $`𝐀\vec{x}`$ thus counts, for every letter, how many of the chosen words use it.
+Strands needs every letter used exactly once, so the target is the all-ones vector $`\vec{b},`$ and
 a solution is any binary $`\vec{x}`$ with
 
 ```math
-\mathbf{A}\vec{x} = \vec{b}
+𝐀\vec{x} = \vec{b}
 ```
 
-The residual $`\vec{r} = \mathbf{A}\vec{x} - \vec{b}`$ shows what's wrong with a candidate. It's 0 where a cell is used
+The residual $`\vec{r} = 𝐀\vec{x} - \vec{b}`$ shows what's wrong with a candidate. It's 0 where a cell is used
 once, −1 where a cell is left over, and +1 or more where chosen words overlap.
 
 For example, take three cells and three words, where word 1 uses cells 1 and 3, word 2 uses
 cell 3, and word 3 uses cells 1 and 2:
 
 ```math
-\mathbf{A} = \begin{pmatrix} 1 & 0 & 1 \\ 0 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}, \qquad
+𝐀 = \begin{pmatrix} 1 & 0 & 1 \\ 0 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}, \qquad
 \vec{b} = \begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}
 ```
 
-Choosing words 2 and 3, $`\vec{x} = (0, 1, 1)`$, gives $`\mathbf{A}\vec{x} - \vec{b} = (0, 0, 0)`$, a perfect cover.
-Choosing words 1 and 3, $`\vec{x} = (1, 0, 1)`$, gives $`\mathbf{A}\vec{x} - \vec{b} = (1, 0, 0)`$: cell 1 is used
+Choosing words 2 and 3, $`\vec{x} = (0, 1, 1),`$ gives $`𝐀\vec{x} - \vec{b} = (0, 0, 0),`$ a perfect cover.
+Choosing words 1 and 3, $`\vec{x} = (1, 0, 1),`$ gives $`𝐀\vec{x} - \vec{b} = (1, 0, 0):`$ cell 1 is used
 twice. This is the example in `optimizecovering._test()`.
 
 ### 4. Solve for the smallest residual
@@ -99,7 +99,7 @@ twice. This is the example in `optimizecovering._test()`.
 smallest residual:
 
 ```math
-\min_{\vec{x} \in \{0,1\}^m} \lVert \mathbf{A}\vec{x} - \vec{b} \rVert_1
+\min_{\vec{x} \in \{0,1\}^m} \lVert 𝐀\vec{x} - \vec{b} \rVert_1
 \quad \text{subject to} \quad \sum_j x_j \le k
 ```
 
@@ -108,21 +108,21 @@ because the spangram sometimes consists of two dictionary words, like FUNNY + BU
 for FUNNYBUSINESS.
 
 To make the problem linear, each absolute value gets a helper variable $`t_i`$ with
-$`t_i \ge (\mathbf{A}\vec{x} - \vec{b})_i`$ and $`t_i \ge -(\mathbf{A}\vec{x} - \vec{b})_i`$, and the optimizer minimizes
-$`\sum_i t_i`$. That's a binary integer linear program, which the optimizer builds with
+$`t_i \ge (𝐀\vec{x} - \vec{b})_i`$ and $`t_i \ge -(𝐀\vec{x} - \vec{b})_i,`$ and the optimizer minimizes
+$`\sum_i t_i.`$ That's a binary integer linear program, which the optimizer builds with
 [PuLP](https://coin-or.github.io/pulp/) and solves with CBC. A minimum of zero means a perfect
 cover. For the example, CBC finds one among the 1,532 binary variables in about 1.3 seconds.
 
 ### 5. Find every exact solution and rank them
 
 A residual of zero doesn't identify the answer on its own. The example has 31 different
-binary $`\vec{x}`$ with $`\mathbf{A}\vec{x} = \vec{b}`$, and CBC returns whichever one it reaches first. Here that's
+binary $`\vec{x}`$ with $`𝐀\vec{x} = \vec{b},`$ and CBC returns whichever one it reaches first. Here that's
 DROUD, SUCCESSOR, EXTA, GEOD, TRANCE, PROM, NIGHT, BOUTONNIERE which is not the puzzle's solution.
 
-So `Solver.solve()`, which `main.py` uses, lists every binary $`\vec{x}`$ with $`\mathbf{A}\vec{x} = \vec{b}`$ and at
+So `Solver.solve()`, which `main.py` uses, lists every binary $`\vec{x}`$ with $`𝐀\vec{x} = \vec{b}`$ and at
 most $`k`$ words, then ranks them. To keep that search fast, it:
 
-- stores each column of $`\mathbf{A}`$ as a bitmask, so checking whether two words overlap is a
+- stores each column of $`𝐀`$ as a bitmask, so checking whether two words overlap is a
   single bitwise AND;
 - always fills the first empty cell, row by row, and only tries words that cover it;
 - stops early when the remaining words couldn't be long enough to fill the rest of the
